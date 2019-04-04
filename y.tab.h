@@ -57,11 +57,13 @@ extern int yydebug;
     SET = 267,
     TO = 268,
     WHERE = 269,
-    VAR = 270,
-    STRING = 271,
-    LB = 272,
-    RB = 273,
-    COLON = 274
+    FROM = 270,
+    VAR = 271,
+    STRING = 272,
+    LB = 273,
+    RB = 274,
+    COLON = 275,
+    REL_OP = 276
   };
 #endif
 /* Tokens.  */
@@ -77,23 +79,25 @@ extern int yydebug;
 #define SET 267
 #define TO 268
 #define WHERE 269
-#define VAR 270
-#define STRING 271
-#define LB 272
-#define RB 273
-#define COLON 274
+#define FROM 270
+#define VAR 271
+#define STRING 272
+#define LB 273
+#define RB 274
+#define COLON 275
+#define REL_OP 276
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 25 "tokens.y" /* yacc.c:1909  */
+#line 34 "tokens.y" /* yacc.c:1909  */
 
         char str[200];              /* Ptr to constant string (strings are malloc'd) */
     
 
-#line 97 "y.tab.h" /* yacc.c:1909  */
+#line 101 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

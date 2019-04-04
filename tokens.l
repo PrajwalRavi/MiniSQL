@@ -17,6 +17,7 @@ into return INTO;
 SET return SET;
 TO return TO;
 WHERE return WHERE;
+FROM return FROM;
 
 [1-9][0-9]* {strcpy(yylval.str,yytext); return NUM;}
 \"[A-Za-z0-9.]+\" {strcpy(yylval.str,yytext);return STRING;}
@@ -24,5 +25,6 @@ WHERE return WHERE;
 \( {strcpy(yylval.str,yytext); return LB;}
 \) {strcpy(yylval.str,yytext); return RB;}
 \; {strcpy(yylval.str,yytext); return COLON;}
+">="|"<="|"!="|"=="|"<"|">" {strcpy(yylval.str,yytext); return REL_OP;}
 . ;
 %%
