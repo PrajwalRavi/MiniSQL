@@ -68,10 +68,11 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	int ind=0;
+	int ind_condition = 0, ind_and_or = 0;
 	char conditions[100][100];
+	int joiners[10];
 
-#line 75 "y.tab.c" /* yacc.c:339  */
+#line 76 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -153,12 +154,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 34 "tokens.y" /* yacc.c:355  */
+#line 35 "tokens.y" /* yacc.c:355  */
 
         char str[200];              /* Ptr to constant string (strings are malloc'd) */
     
 
-#line 162 "y.tab.c" /* yacc.c:355  */
+#line 163 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -175,7 +176,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 179 "y.tab.c" /* yacc.c:358  */
+#line 180 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -474,8 +475,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    39,    39,    39,    41,    51,    63,    74,    75,    77,
-      82,    89,    89
+       0,    40,    40,    40,    42,    52,    64,    95,    96,    98,
+     105,   114,   115
 };
 #endif
 
@@ -1262,13 +1263,13 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 39 "tokens.y" /* yacc.c:1646  */
+#line 40 "tokens.y" /* yacc.c:1646  */
     {printf("Statement executed succesfully.\n");}
-#line 1268 "y.tab.c" /* yacc.c:1646  */
+#line 1269 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 41 "tokens.y" /* yacc.c:1646  */
+#line 42 "tokens.y" /* yacc.c:1646  */
     {
 		char *file_name = "EMP.txt";
 		if(strcmp((yyvsp[-1].str),file_name))
@@ -1280,11 +1281,11 @@ yyreduce:
 		fprintf(fp, "%s %s %s %s %s %s\n",(yyvsp[-9].str),(yyvsp[-8].str),(yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-5].str),(yyvsp[-4].str) );
 		fclose(fp);
 	}
-#line 1284 "y.tab.c" /* yacc.c:1646  */
+#line 1285 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 51 "tokens.y" /* yacc.c:1646  */
+#line 52 "tokens.y" /* yacc.c:1646  */
     {
 		char *file_name = "DEPT.txt";
 		if(strcmp((yyvsp[-1].str),file_name))
@@ -1296,58 +1297,94 @@ yyreduce:
 		fprintf(fp, "%s %s %s\n",(yyvsp[-6].str),(yyvsp[-5].str),(yyvsp[-4].str));
 		fclose(fp);
 	}
-#line 1300 "y.tab.c" /* yacc.c:1646  */
+#line 1301 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 63 "tokens.y" /* yacc.c:1646  */
+#line 64 "tokens.y" /* yacc.c:1646  */
     {
 		if(strcmp((yyvsp[-3].str),"EMP.txt")!=0 && strcmp((yyvsp[-3].str),"DEPT.txt")!=0)
 		{
 			printf("File doesn't exist\n");
 			return 0;
 		}
-		FILE *fp = fopen((yyvsp[-3].str),"a");
-		for(int i=0; i<ind; i++)
-			printf("%s\n",conditions[i] );
+		FILE *fp = fopen((yyvsp[-3].str),"r");
+	    char line[100];
+	    char* token;
+    	while (fgets(line,sizeof(line),fp)!=NULL)
+		{
+			printf("%s",line );
+			int field_num = 1;
+			token = strtok(line," ");
+			while(token!=NULL)
+			{
+				// printf("%s\n",token );
+				char condition[100];
+				for(int i=0; i<ind_condition; i++)
+				{
+					strcpy(condition, conditions[i]);
+					char* operand1 = strtok(condition," ");
+					char* operator = strtok(NULL," ");
+					char* operand2 = strtok(NULL," ");
+					printf("%s \n%s %s\n", operand1,operator,operand2);
+				}
+				token = strtok(NULL," ");
+			}
+		}
 	}
-#line 1315 "y.tab.c" /* yacc.c:1646  */
+#line 1336 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 74 "tokens.y" /* yacc.c:1646  */
-    {strcpy(conditions[ind++],(yyvsp[-2].str));}
-#line 1321 "y.tab.c" /* yacc.c:1646  */
+#line 95 "tokens.y" /* yacc.c:1646  */
+    {strcpy(conditions[ind_condition++],(yyvsp[-2].str));}
+#line 1342 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 75 "tokens.y" /* yacc.c:1646  */
-    {strcpy(conditions[ind++],(yyvsp[0].str));}
-#line 1327 "y.tab.c" /* yacc.c:1646  */
+#line 96 "tokens.y" /* yacc.c:1646  */
+    {strcpy(conditions[ind_condition++],(yyvsp[0].str));}
+#line 1348 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 77 "tokens.y" /* yacc.c:1646  */
+#line 98 "tokens.y" /* yacc.c:1646  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
+		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[-1].str));
+		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1337 "y.tab.c" /* yacc.c:1646  */
+#line 1360 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 82 "tokens.y" /* yacc.c:1646  */
+#line 105 "tokens.y" /* yacc.c:1646  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
+		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[-1].str));
+		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1347 "y.tab.c" /* yacc.c:1646  */
+#line 1372 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 114 "tokens.y" /* yacc.c:1646  */
+    { joiners[ind_and_or++] = 1; }
+#line 1378 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 115 "tokens.y" /* yacc.c:1646  */
+    { joiners[ind_and_or++] = 0; }
+#line 1384 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1351 "y.tab.c" /* yacc.c:1646  */
+#line 1388 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1575,4 +1612,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 90 "tokens.y" /* yacc.c:1906  */
+#line 116 "tokens.y" /* yacc.c:1906  */

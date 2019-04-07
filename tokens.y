@@ -3,8 +3,9 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	int ind=0;
+	int ind_condition = 0, ind_and_or = 0;
 	char conditions[100][100];
+	int joiners[10];
 %}
 
 %token <str> INSERT 
@@ -66,25 +67,49 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			printf("File doesn't exist\n");
 			return 0;
 		}
-		FILE *fp = fopen($4,"a");
-		for(int i=0; i<ind; i++)
-			printf("%s\n",conditions[i] );
+		FILE *fp = fopen($4,"r");
+	    char line[100];
+	    char* token;
+    	while (fgets(line,sizeof(line),fp)!=NULL)
+		{
+			printf("%s",line );
+			int field_num = 1;
+			token = strtok(line," ");
+			while(token!=NULL)
+			{
+				// printf("%s\n",token );
+				char condition[100];
+				for(int i=0; i<ind_condition; i++)
+				{
+					strcpy(condition, conditions[i]);
+					char* operand1 = strtok(condition," ");
+					char* operator = strtok(NULL," ");
+					char* operand2 = strtok(NULL," ");
+				}
+				token = strtok(NULL," ");
+			}
+		}
 	};
 
-CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind++],$1);}
-			| CONDITION {strcpy(conditions[ind++],$1);};  
+CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
+			| CONDITION {strcpy(conditions[ind_condition++],$1);};  
 
 CONDITION: VAR REL_OP STRING {
 		strcpy($$,$1);
+		strcat($$," ");
 		strcat($$,$2);
+		strcat($$," ");
 		strcat($$,$3);
 		};
 	| VAR REL_OP NUM {
 		strcpy($$,$1);
+		strcat($$," ");
 		strcat($$,$2);
+		strcat($$," ");
 		strcat($$,$3);
 		};
 
 
-JOINER: AND | OR;
+JOINER: AND { joiners[ind_and_or++] = 1; }
+		| OR { joiners[ind_and_or++] = 0; };
 %%
