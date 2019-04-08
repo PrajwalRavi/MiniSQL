@@ -6,6 +6,32 @@
 	int ind_condition = 0, ind_and_or = 0;
 	char conditions[100][100];
 	int joiners[10];
+
+	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
+	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
+
+	int check_conditions()
+	{
+		char condition[100];
+		// Iterate over each condition
+		for(int i=0; i<ind_condition; i++)
+		{
+			strcpy(condition, conditions[i]);
+			char* field = strtok(condition," ");
+			for(int i=0; i<6; i++)
+				if(strcmp(emp_fields[i],field)==0)
+					return 1;
+			for(int i=0; i<3; i++)
+				if(strcmp(dept_fields[i],field)==0)
+					return 1;
+			// if(!(strcmp(field,"eid") || strcmp(field,"ename") || strcmp(field,"eage") || strcmp(field,"eaddress") || strcmp(field,"salary") || strcmp(field,"deptno")))
+			// 	return 0;
+			// if(!(strcmp(field,"dnum") || strcmp(field,"dname") || strcmp(field,"dlocation")))
+			// 	return 0;
+		}
+		return 0;
+	}
+
 %}
 
 %token <str> INSERT 
@@ -37,7 +63,7 @@
     };
 
 %%	
-STMT: INS | DEL {printf("Statement executed succesfully.\n");};
+STMT: INS | DEL /*{printf("Statement executed succesfully.\n");}*/;
 
 INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		char *file_name = "EMP.txt";
@@ -67,28 +93,86 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			printf("File doesn't exist\n");
 			return 0;
 		}
-		FILE *fp = fopen($4,"r");
-	    char line[100];
-	    char* token;
-    	while (fgets(line,sizeof(line),fp)!=NULL)
+		if(check_conditions()==0)
 		{
-			printf("%s",line );
-			int field_num = 1;
-			token = strtok(line," ");
-			while(token!=NULL)
+			printf("Error in conditions\n");
+			return 0; 
+		}
+
+		FILE *fp = fopen($4,"r");
+		FILE *fp_temp = fopen("temp_file.txt","w");
+	    char line[100], original_line[100];
+	    char *field_val;
+	    	    
+    	while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		{
+			strcpy(original_line,line);
+			printf("Evaluating %s",line );
+			int field_num = 0;
+			char* saveptr1;
+			field_val = strtok_r(line," ",&saveptr1);
+			int flag = 1;
+
+			while(field_val!=NULL)	// Iterate over each field in the record
 			{
-				// printf("%s\n",token );
+				char field_name[10];
+				strcpy(field_name,emp_fields[field_num]);
 				char condition[100];
+	    		// Iterate over each condition
 				for(int i=0; i<ind_condition; i++)
 				{
+					char* saveptr2;
 					strcpy(condition, conditions[i]);
-					char* operand1 = strtok(condition," ");
-					char* operator = strtok(NULL," ");
-					char* operand2 = strtok(NULL," ");
+					char* operand1 = strtok_r(condition," ",&saveptr2);
+					char* operator = strtok_r(NULL," ",&saveptr2);
+					char* operand2 = strtok_r(NULL," ",&saveptr2);
+					if(strcmp(operand1,field_name)==0)
+					{
+						// Checking for integer fields
+						if(field_num!=1 && field_num!=3)
+						{
+							int op = atoi(operand2);
+							int val = atoi(field_val);
+							if((strcmp(operator,"==")==0 && op!=val)
+								|| (strcmp(operator,"!=")==0 && op==val)
+								|| (strcmp(operator,">=")==0 && op>val)
+								|| (strcmp(operator,"<=")==0 && op<val)
+								|| (strcmp(operator,">")==0 && op>=val)
+								|| (strcmp(operator,"<")==0 && op<=val)
+								)
+							{
+								flag=0;
+								break;
+							}
+						}
+						// For strings
+						else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val))
+							|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val)==0)
+							|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)<0)
+							|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)>0)
+							|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)<=0)
+							|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)>=0)
+							)
+						{
+							flag=0;
+							break;
+						}
+
+					}
 				}
-				token = strtok(NULL," ");
+				field_num++;
+				field_val = strtok_r(NULL," ",&saveptr1);
+			}
+			if(!flag)
+			{
+				fprintf(fp_temp, "%s",original_line );
+				printf("WORKS!!\n");
 			}
 		}
+		// TO-DO : Replace everything in file 1 with everything in temp_file.
+		// TO-DO : Implement And Or stuff
+		fclose(fp);
+		fclose(fp_temp);
 	};
 
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
