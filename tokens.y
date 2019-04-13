@@ -13,23 +13,29 @@
 	int check_conditions()
 	{
 		char condition[100];
+		int result = 1;
 		// Iterate over each condition
 		for(int i=0; i<ind_condition; i++)
 		{
 			strcpy(condition, conditions[i]);
 			char* field = strtok(condition," ");
 			for(int i=0; i<6; i++)
-				if(strcmp(emp_fields[i],field)==0)
-					return 1;
+				if(strcmp(emp_fields[i],field)!=0)
+					result = 0;
+		}
+		result = 1;
+		for(int i=0; i<ind_condition; i++)
+		{
 			for(int i=0; i<3; i++)
-				if(strcmp(dept_fields[i],field)==0)
-					return 1;
+				if(strcmp(dept_fields[i],field)!=0)
+					result =  0;
 			// if(!(strcmp(field,"eid") || strcmp(field,"ename") || strcmp(field,"eage") || strcmp(field,"eaddress") || strcmp(field,"salary") || strcmp(field,"deptno")))
 			// 	return 0;
 			// if(!(strcmp(field,"dnum") || strcmp(field,"dname") || strcmp(field,"dlocation")))
 			// 	return 0;
 		}
-		return 0;
+		
+		return result;
 	}
 
 %}
