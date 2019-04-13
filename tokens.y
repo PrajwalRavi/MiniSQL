@@ -48,6 +48,19 @@
 		return 1;
 	}
 
+	int check_uniqueness(char* file_name, char* value)
+	{
+		char line[100];
+		char* field_val;
+		FILE* fp = fopen(file_name,"r");
+		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		{
+			field_val = strtok(line," ");
+			if(strcmp(field_val,value)==0)
+				return 0;
+		}
+		return 1;
+	}
 %}
 
 %token <str> INSERT 
@@ -88,6 +101,32 @@ INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 			printf("File doesn't exist\n");
 			return 0;
 		}
+		if(!check_uniqueness(file_name,$4))
+		{
+			printf("Eid should be unique\n");
+			return 0;
+		}
+		
+		// Check foreign-key constraint
+		FILE* dept_fp = fopen("DEPT.txt","r");
+		char line[100];
+		char* field_val;
+		int flag = 1;
+		while (fgets(line,100,dept_fp)!=NULL)	// Iterate over each record
+		{
+			field_val = strtok(line," ");
+			if(strcmp(field_val,$9)==0)
+			{
+				flag=0;
+				break;
+			}
+		}
+		if(flag)
+		{
+			printf("Foreign-key constraint violated\n");
+			return 0;
+		}
+
 		FILE *fp = fopen($12,"a");
 		fprintf(fp, "%s %s %s %s %s %s\n",$4,$5,$6,$7,$8,$9 );
 		fclose(fp);
@@ -98,6 +137,11 @@ INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 			printf("File doesn't exist\n");
 			return 0;
 		}
+		if(!check_uniqueness(file_name,$4))
+		{
+			printf("Deptno should be unique\n");
+			return 0;
+		}		
 		FILE *fp = fopen($9,"a");
 		fprintf(fp, "%s %s %s\n",$4,$5,$6);
 		fclose(fp);
