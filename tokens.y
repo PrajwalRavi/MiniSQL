@@ -3,9 +3,9 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	int ind_condition = 0, ind_and_or = 0;
+	int ind_condition = 0, ind_and_or = 0, ind_result = 0;
 	char conditions[100][100];
-	int joiners[10];
+	int joiners[10],results[100]={0};
 
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
@@ -59,8 +59,8 @@
 %type <str> JOINER
 
 %union {
-        char str[200];              /* Ptr to constant string (strings are malloc'd) */
-    };
+		char str[200];              /* Ptr to constant string (strings are malloc'd) */
+	};
 
 %%	
 STMT: INS | DEL /*{printf("Statement executed succesfully.\n");}*/;
@@ -101,10 +101,10 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 
 		FILE *fp = fopen($4,"r");
 		FILE *fp_temp = fopen("temp_file.txt","w");
-	    char line[100], original_line[100];
-	    char *field_val;
-	    	    
-    	while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		char line[100], original_line[100];
+		char *field_val;
+				
+		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
 		{
 			strcpy(original_line,line);
 			printf("Evaluating %s",line );
@@ -118,7 +118,7 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 				char field_name[10];
 				strcpy(field_name,emp_fields[field_num]);
 				char condition[100];
-	    		// Iterate over each condition
+				// Iterate over each condition
 				for(int i=0; i<ind_condition; i++)
 				{
 					char* saveptr2;
@@ -141,9 +141,12 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 								|| (strcmp(operator,"<")==0 && op<=val)
 								)
 							{
+								results[ind_result++]=0;
 								flag=0;
 								break;
 							}
+							else 
+								results[ind_result++]=1;
 						}
 						// For strings
 						else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val))
@@ -154,9 +157,12 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 							|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)>=0)
 							)
 						{
+							results[ind_result++]=0;
 							flag=0;
 							break;
 						}
+						else 
+							results[ind_result++]=1;
 
 					}
 				}
@@ -169,10 +175,15 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 				printf("WORKS!!\n");
 			}
 		}
-		// TO-DO : Replace everything in file 1 with everything in temp_file.
 		// TO-DO : Implement And Or stuff
 		fclose(fp);
 		fclose(fp_temp);
+		// Replaces file contents with temp_file
+		// fp = fopen($4,"w");
+		// fp_temp = fopen("temp_file.txt","r");
+		// char line[100];	    	    
+		// while (fgets(line,100,fp_temp)!=NULL)
+		// 	fprintf(fp, "%s",line );
 	};
 
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}

@@ -94,8 +94,8 @@ union YYSTYPE
 {
 #line 61 "tokens.y" /* yacc.c:1909  */
 
-        char str[200];              /* Ptr to constant string (strings are malloc'd) */
-    
+		char str[200];              /* Ptr to constant string (strings are malloc'd) */
+	
 
 #line 101 "y.tab.h" /* yacc.c:1909  */
 };

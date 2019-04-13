@@ -5,3 +5,4 @@ test.txt
 lex.yy.c
 y.tab.h
 y.tab.c
+temp_file.txt

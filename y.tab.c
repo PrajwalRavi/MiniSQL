@@ -68,9 +68,9 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	int ind_condition = 0, ind_and_or = 0;
+	int ind_condition = 0, ind_and_or = 0, ind_result = 0;
 	char conditions[100][100];
-	int joiners[10];
+	int joiners[10],results[100]={0};
 
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
@@ -182,8 +182,8 @@ union YYSTYPE
 {
 #line 61 "tokens.y" /* yacc.c:355  */
 
-        char str[200];              /* Ptr to constant string (strings are malloc'd) */
-    
+		char str[200];              /* Ptr to constant string (strings are malloc'd) */
+	
 
 #line 189 "y.tab.c" /* yacc.c:355  */
 };
@@ -501,8 +501,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    66,    66,    66,    68,    78,    90,   178,   179,   181,
-     188,   197,   198
+       0,    66,    66,    66,    68,    78,    90,   189,   190,   192,
+     199,   208,   209
 };
 #endif
 
@@ -1336,10 +1336,10 @@ yyreduce:
 
 		FILE *fp = fopen((yyvsp[-3].str),"r");
 		FILE *fp_temp = fopen("temp_file.txt","w");
-	    char line[100], original_line[100];
-	    char *field_val;
-	    	    
-    	while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		char line[100], original_line[100];
+		char *field_val;
+				
+		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
 		{
 			strcpy(original_line,line);
 			printf("Evaluating %s",line );
@@ -1353,7 +1353,7 @@ yyreduce:
 				char field_name[10];
 				strcpy(field_name,emp_fields[field_num]);
 				char condition[100];
-	    		// Iterate over each condition
+				// Iterate over each condition
 				for(int i=0; i<ind_condition; i++)
 				{
 					char* saveptr2;
@@ -1369,16 +1369,19 @@ yyreduce:
 							int op = atoi(operand2);
 							int val = atoi(field_val);
 							if((strcmp(operator,"==")==0 && op!=val)
-							|| (strcmp(operator,"!=")==0 && op==val)
-							|| (strcmp(operator,">=")==0 && op>val)
-							|| (strcmp(operator,"<=")==0 && op<val)
-							|| (strcmp(operator,">")==0 && op>=val)
-							|| (strcmp(operator,"<")==0 && op<=val)
-							)
+								|| (strcmp(operator,"!=")==0 && op==val)
+								|| (strcmp(operator,">=")==0 && op>val)
+								|| (strcmp(operator,"<=")==0 && op<val)
+								|| (strcmp(operator,">")==0 && op>=val)
+								|| (strcmp(operator,"<")==0 && op<=val)
+								)
 							{
+								results[ind_result++]=0;
 								flag=0;
 								break;
 							}
+							else 
+								results[ind_result++]=1;
 						}
 						// For strings
 						else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val))
@@ -1389,9 +1392,12 @@ yyreduce:
 							|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)>=0)
 							)
 						{
+							results[ind_result++]=0;
 							flag=0;
 							break;
 						}
+						else 
+							results[ind_result++]=1;
 
 					}
 				}
@@ -1404,28 +1410,33 @@ yyreduce:
 				printf("WORKS!!\n");
 			}
 		}
-		// TO-DO : Replace everything in file 1 with everything in temp_file.
 		// TO-DO : Implement And Or stuff
 		fclose(fp);
 		fclose(fp_temp);
+		// Replaces file contents with temp_file
+		// fp = fopen($4,"w");
+		// fp_temp = fopen("temp_file.txt","r");
+		// char line[100];	    	    
+		// while (fgets(line,100,fp_temp)!=NULL)
+		// 	fprintf(fp, "%s",line );
 	}
-#line 1413 "y.tab.c" /* yacc.c:1646  */
+#line 1424 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 178 "tokens.y" /* yacc.c:1646  */
+#line 189 "tokens.y" /* yacc.c:1646  */
     {strcpy(conditions[ind_condition++],(yyvsp[-2].str));}
-#line 1419 "y.tab.c" /* yacc.c:1646  */
+#line 1430 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 179 "tokens.y" /* yacc.c:1646  */
+#line 190 "tokens.y" /* yacc.c:1646  */
     {strcpy(conditions[ind_condition++],(yyvsp[0].str));}
-#line 1425 "y.tab.c" /* yacc.c:1646  */
+#line 1436 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 181 "tokens.y" /* yacc.c:1646  */
+#line 192 "tokens.y" /* yacc.c:1646  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
 		strcat((yyval.str)," ");
@@ -1433,11 +1444,11 @@ yyreduce:
 		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1437 "y.tab.c" /* yacc.c:1646  */
+#line 1448 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 188 "tokens.y" /* yacc.c:1646  */
+#line 199 "tokens.y" /* yacc.c:1646  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
 		strcat((yyval.str)," ");
@@ -1445,23 +1456,23 @@ yyreduce:
 		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1449 "y.tab.c" /* yacc.c:1646  */
+#line 1460 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 197 "tokens.y" /* yacc.c:1646  */
+#line 208 "tokens.y" /* yacc.c:1646  */
     { joiners[ind_and_or++] = 1; }
-#line 1455 "y.tab.c" /* yacc.c:1646  */
+#line 1466 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 198 "tokens.y" /* yacc.c:1646  */
+#line 209 "tokens.y" /* yacc.c:1646  */
     { joiners[ind_and_or++] = 0; }
-#line 1461 "y.tab.c" /* yacc.c:1646  */
+#line 1472 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1465 "y.tab.c" /* yacc.c:1646  */
+#line 1476 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1689,4 +1700,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 199 "tokens.y" /* yacc.c:1906  */
+#line 210 "tokens.y" /* yacc.c:1906  */
