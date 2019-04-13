@@ -26,6 +26,8 @@
 		result = 1;
 		for(int i=0; i<ind_condition; i++)
 		{
+			strcpy(condition, conditions[i]);
+			char* field = strtok(condition," ");
 			for(int i=0; i<3; i++)
 				if(strcmp(dept_fields[i],field)!=0)
 					result =  0;
@@ -69,7 +71,7 @@
 	};
 
 %%	
-STMT: INS | DEL /*{printf("Statement executed succesfully.\n");}*/;
+STMT: INS {printf("Statement executed succesfully.\n");}; | DEL {printf("Statement executed succesfully.\n");};
 
 INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		char *file_name = "EMP.txt";

@@ -82,27 +82,35 @@
 	int check_conditions()
 	{
 		char condition[100];
+		int result = 1;
 		// Iterate over each condition
 		for(int i=0; i<ind_condition; i++)
 		{
 			strcpy(condition, conditions[i]);
 			char* field = strtok(condition," ");
 			for(int i=0; i<6; i++)
-				if(strcmp(emp_fields[i],field)==0)
-					return 1;
+				if(strcmp(emp_fields[i],field)!=0)
+					result = 0;
+		}
+		result = 1;
+		for(int i=0; i<ind_condition; i++)
+		{
+			strcpy(condition, conditions[i]);
+			char* field = strtok(condition," ");
 			for(int i=0; i<3; i++)
-				if(strcmp(dept_fields[i],field)==0)
-					return 1;
+				if(strcmp(dept_fields[i],field)!=0)
+					result =  0;
 			// if(!(strcmp(field,"eid") || strcmp(field,"ename") || strcmp(field,"eage") || strcmp(field,"eaddress") || strcmp(field,"salary") || strcmp(field,"deptno")))
 			// 	return 0;
 			// if(!(strcmp(field,"dnum") || strcmp(field,"dname") || strcmp(field,"dlocation")))
 			// 	return 0;
 		}
-		return 0;
+		
+		return result;
 	}
 
 
-#line 106 "y.tab.c" /* yacc.c:337  */
+#line 114 "y.tab.c" /* yacc.c:337  */
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -187,12 +195,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 61 "tokens.y" /* yacc.c:352  */
+#line 69 "tokens.y" /* yacc.c:352  */
 
 		char str[200];              /* Ptr to constant string (strings are malloc'd) */
 	
 
-#line 196 "y.tab.c" /* yacc.c:352  */
+#line 204 "y.tab.c" /* yacc.c:352  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -497,8 +505,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    66,    66,    66,    68,    78,    90,   189,   190,   192,
-     199,   208,   209
+       0,    74,    74,    74,    76,    86,    98,   197,   198,   200,
+     207,   216,   217
 };
 #endif
 
@@ -1293,8 +1301,20 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 4:
-#line 68 "tokens.y" /* yacc.c:1652  */
+        case 2:
+#line 74 "tokens.y" /* yacc.c:1652  */
+    {printf("Statement executed succesfully.\n");}
+#line 1308 "y.tab.c" /* yacc.c:1652  */
+    break;
+
+  case 3:
+#line 74 "tokens.y" /* yacc.c:1652  */
+    {printf("Statement executed succesfully.\n");}
+#line 1314 "y.tab.c" /* yacc.c:1652  */
+    break;
+
+  case 4:
+#line 76 "tokens.y" /* yacc.c:1652  */
     {
 		char *file_name = "EMP.txt";
 		if(strcmp((yyvsp[-1].str),file_name))
@@ -1306,11 +1326,11 @@ yyreduce:
 		fprintf(fp, "%s %s %s %s %s %s\n",(yyvsp[-9].str),(yyvsp[-8].str),(yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-5].str),(yyvsp[-4].str) );
 		fclose(fp);
 	}
-#line 1310 "y.tab.c" /* yacc.c:1652  */
+#line 1330 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 5:
-#line 78 "tokens.y" /* yacc.c:1652  */
+#line 86 "tokens.y" /* yacc.c:1652  */
     {
 		char *file_name = "DEPT.txt";
 		if(strcmp((yyvsp[-1].str),file_name))
@@ -1322,11 +1342,11 @@ yyreduce:
 		fprintf(fp, "%s %s %s\n",(yyvsp[-6].str),(yyvsp[-5].str),(yyvsp[-4].str));
 		fclose(fp);
 	}
-#line 1326 "y.tab.c" /* yacc.c:1652  */
+#line 1346 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 6:
-#line 90 "tokens.y" /* yacc.c:1652  */
+#line 98 "tokens.y" /* yacc.c:1652  */
     {
 		if(strcmp((yyvsp[-3].str),"EMP.txt")!=0 && strcmp((yyvsp[-3].str),"DEPT.txt")!=0)
 		{
@@ -1425,23 +1445,23 @@ yyreduce:
 		// while (fgets(line,100,fp_temp)!=NULL)
 		// 	fprintf(fp, "%s",line );
 	}
-#line 1429 "y.tab.c" /* yacc.c:1652  */
+#line 1449 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 7:
-#line 189 "tokens.y" /* yacc.c:1652  */
+#line 197 "tokens.y" /* yacc.c:1652  */
     {strcpy(conditions[ind_condition++],(yyvsp[-2].str));}
-#line 1435 "y.tab.c" /* yacc.c:1652  */
+#line 1455 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 8:
-#line 190 "tokens.y" /* yacc.c:1652  */
+#line 198 "tokens.y" /* yacc.c:1652  */
     {strcpy(conditions[ind_condition++],(yyvsp[0].str));}
-#line 1441 "y.tab.c" /* yacc.c:1652  */
+#line 1461 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 9:
-#line 192 "tokens.y" /* yacc.c:1652  */
+#line 200 "tokens.y" /* yacc.c:1652  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
 		strcat((yyval.str)," ");
@@ -1449,11 +1469,11 @@ yyreduce:
 		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1453 "y.tab.c" /* yacc.c:1652  */
+#line 1473 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 10:
-#line 199 "tokens.y" /* yacc.c:1652  */
+#line 207 "tokens.y" /* yacc.c:1652  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
 		strcat((yyval.str)," ");
@@ -1461,23 +1481,23 @@ yyreduce:
 		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1465 "y.tab.c" /* yacc.c:1652  */
+#line 1485 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 11:
-#line 208 "tokens.y" /* yacc.c:1652  */
+#line 216 "tokens.y" /* yacc.c:1652  */
     { joiners[ind_and_or++] = 1; }
-#line 1471 "y.tab.c" /* yacc.c:1652  */
+#line 1491 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 12:
-#line 209 "tokens.y" /* yacc.c:1652  */
+#line 217 "tokens.y" /* yacc.c:1652  */
     { joiners[ind_and_or++] = 0; }
-#line 1477 "y.tab.c" /* yacc.c:1652  */
+#line 1497 "y.tab.c" /* yacc.c:1652  */
     break;
 
 
-#line 1481 "y.tab.c" /* yacc.c:1652  */
+#line 1501 "y.tab.c" /* yacc.c:1652  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1708,4 +1728,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 210 "tokens.y" /* yacc.c:1918  */
+#line 218 "tokens.y" /* yacc.c:1918  */

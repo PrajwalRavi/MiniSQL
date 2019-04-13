@@ -96,7 +96,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 61 "tokens.y" /* yacc.c:1921  */
+#line 69 "tokens.y" /* yacc.c:1921  */
 
 		char str[200];              /* Ptr to constant string (strings are malloc'd) */
 	
