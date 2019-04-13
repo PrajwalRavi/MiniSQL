@@ -13,31 +13,39 @@
 	int check_conditions()
 	{
 		char condition[100];
-		int result = 1;
+		int result = 0;
 		// Iterate over each condition
 		for(int i=0; i<ind_condition; i++)
 		{
+			result = 0;
 			strcpy(condition, conditions[i]);
 			char* field = strtok(condition," ");
 			for(int i=0; i<6; i++)
 				if(strcmp(emp_fields[i],field)!=0)
-					result = 0;
+					result = 1;
+			if(result==0)
+				break;
 		}
+		if(result==1)
+			return 1;
 		result = 1;
 		for(int i=0; i<ind_condition; i++)
 		{
+			result = 0;
 			strcpy(condition, conditions[i]);
 			char* field = strtok(condition," ");
 			for(int i=0; i<3; i++)
 				if(strcmp(dept_fields[i],field)!=0)
-					result =  0;
+					result =  1;
+			if(result==0)
+				return 0;
 			// if(!(strcmp(field,"eid") || strcmp(field,"ename") || strcmp(field,"eage") || strcmp(field,"eaddress") || strcmp(field,"salary") || strcmp(field,"deptno")))
 			// 	return 0;
 			// if(!(strcmp(field,"dnum") || strcmp(field,"dname") || strcmp(field,"dlocation")))
 			// 	return 0;
 		}
 		
-		return result;
+		return 1;
 	}
 
 %}
@@ -115,7 +123,6 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
 		{
 			strcpy(original_line,line);
-			printf("Evaluating %s",line );
 			int field_num = 0;
 			char* saveptr1;
 			field_val = strtok_r(line," ",&saveptr1);
@@ -180,18 +187,16 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			if(!flag)
 			{
 				fprintf(fp_temp, "%s",original_line );
-				printf("WORKS!!\n");
 			}
 		}
 		// TO-DO : Implement And Or stuff
 		fclose(fp);
 		fclose(fp_temp);
 		// Replaces file contents with temp_file
-		// fp = fopen($4,"w");
-		// fp_temp = fopen("temp_file.txt","r");
-		// char line[100];	    	    
-		// while (fgets(line,100,fp_temp)!=NULL)
-		// 	fprintf(fp, "%s",line );
+		fp = fopen($4,"w");
+		fp_temp = fopen("temp_file.txt","r");
+		while (fgets(line,100,fp_temp)!=NULL)
+			fprintf(fp, "%s",line );
 	};
 
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
