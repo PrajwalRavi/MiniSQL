@@ -81,7 +81,6 @@
 		int row = -1;
 		if(strcmp(file,"DEPT.txt") == 0)
 		{
-			FILE *fp1 = fopen("EMP.txt","r");
 			while (fgets(line,100,fp)!=NULL)
 			{
 				char original_line[100];
@@ -92,6 +91,7 @@
 					char* dsaveptr;
 					char *dfields = strtok_r(line," ",&dsaveptr);
 					int ddeptno = atoi(dfields);
+					FILE *fp1 = fopen("EMP.txt","r");
 					while(fgets(record,100,fp1) != NULL)
 					{	
 						int num_field = 0;
@@ -105,18 +105,17 @@
 						int edeptno = atoi(efields);
 						if(edeptno == ddeptno)
 						{
-							printf("Cannot delete a reference to a foreign key!!\n");
+							// printf("Cannot delete a reference to a foreign key!!\n");
 							fprintf(fp_temp, "%s",original_line);	
 						}
 
 					}
-					
+					fclose(fp1);	
 				}
 				else
 					fprintf(fp_temp,"%s",line);
 			}
 
-			fclose(fp1);	
 		}
 
 		else
