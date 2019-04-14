@@ -4,9 +4,11 @@
 	#include <string.h>
 
 	int ind_condition = 0, ind_and_or = 0, ind_result = 0;
+	int emp_size = 0,dept_size = 0;
+	char *file1 = "EMP.txt";
+	char *file2 = "DEPT.txt";
 	char conditions[100][100];
 	int joiners[10],results[100]={0};
-
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
 
@@ -48,6 +50,161 @@
 		return 1;
 	}
 
+	void Delete(char *file,int res[100])
+	{
+		FILE *fp_temp = fopen("temp_file.txt","w");
+		FILE *fp = fopen(file,"r");
+		char record[100],line[100];
+		int row = -1;
+		if(strcmp(file,"DEPT.txt") == 0)
+		{
+			FILE *fp1 = fopen("EMP.txt","r");
+			while (fgets(line,100,fp)!=NULL)
+			{
+				char* original_line;
+				strcpy(original_line,line);
+				row++;
+				if(res[row])
+				{
+					char* dsaveptr;
+					char *dfields = strtok_r(line," ",&dsaveptr);
+					int ddeptno = atoi(dfields);
+					while(fgets(record,100,fp1) != NULL)
+					{	
+						int num_field = 0;
+						char *esaveptr;
+						char *efields = strtok_r(record," ",&esaveptr);
+						while(num_field != 5)
+						{	
+							efields = strtok_r(NULL," ",&esaveptr);
+							num_field++;
+						}
+						int edeptno = atoi(efields);
+						if(edeptno == ddeptno)
+						{
+							printf("Cannot delete a reference to a foreign key!!\n");
+							fprintf(fp_temp, "%s",original_line);	
+						}
+
+					}
+					
+				}
+				else
+				{
+					fprintf(fp_temp,"%s",line);
+				}
+			}
+
+			fclose(fp1);	
+		}
+
+		else
+		{
+			while (fgets(line,100,fp)!=NULL)
+			{
+				row++;
+				if(!res[row])
+					fprintf(fp_temp, "%s",line );
+			
+			}
+		}
+		fclose(fp);
+		fclose(fp_temp);
+		fp = fopen(file,"w");
+		fp_temp = fopen("temp_file.txt","r");
+		while (fgets(line,100,fp_temp)!=NULL)
+			fprintf(fp, "%s",line );
+		fclose(fp);
+		fclose(fp_temp);
+	}
+	int Result(char * file,int ind_condition)
+	{
+		// printf("I sdfam here!!!!!!!!!\n");
+
+		FILE *fp  = fopen(file,"r");
+		char line[100], original_line[100];
+		char *field_val;
+		int row = -1,i = ind_condition;
+		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		{
+			row++;
+			// printf("%d\n",row);
+			strcpy(original_line,line);
+			int field_num = 0;
+			char* saveptr1;
+			field_val = strtok_r(line," ",&saveptr1);
+
+			while(field_val!=NULL)	// Iterate over each field in the record
+			{
+				// printf("infinite\n");
+				char field_name[10];
+				if(strcmp(file,"EMP.txt") == 0)
+					strcpy(field_name,emp_fields[field_num]);
+				else strcpy(field_name,dept_fields[field_num]);
+				char condition[100];
+				char* saveptr2;
+				strcpy(condition, conditions[i]);
+				char* operand1 = strtok_r(condition," ",&saveptr2);
+				char* operator = strtok_r(NULL," ",&saveptr2);
+				char* operand2 = strtok_r(NULL," ",&saveptr2);
+				if(strcmp(operand1,field_name)==0)
+				{
+					// Checkg for integer fields
+					// printf("sdfdsdf\n");
+					int j = strcmp(file,"EMP.txt")==0?3:2;
+					if(field_num!=1 && field_num!=j)
+					{
+						int op = atoi(operand2);
+						int val = atoi(field_val);
+						if((strcmp(operator,"==")==0 && op==val)
+							|| (strcmp(operator,"!=")==0 && op!=val)
+							|| (strcmp(operator,">=")==0 && op<=val)
+							|| (strcmp(operator,"<=")==0 && op>=val)
+							|| (strcmp(operator,">")==0 && op<val)
+							|| (strcmp(operator,"<")==0 && op>val)
+							)
+						{
+							results[row] = 1;
+							// printf("Remove%d\n",row);
+						}
+						else 
+						{
+							results[row] = 0;
+							// printf("Keep%d\n",row);
+						}
+					}
+					// For strings
+					else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
+						|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val))
+						|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)>=0)
+						|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)<=0)
+						|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)>0)
+						|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)<0)
+						)
+					{
+						results[row] = 1;
+						// printf("Remove%d\n",row);
+					}
+					else 
+					{
+						results[row] = 0;
+						// printf("Keep%d\n",row);
+					}
+
+				}
+			field_num++;
+			field_val = strtok_r(NULL," ",&saveptr1);
+			}
+		}
+		fclose(fp);
+		// printf("%d\n",row);
+		// for(int k = 0;k <= row;k++){
+		// 	printf("%d ",results[k]);
+		// }
+		printf("\n");
+		return row;
+					
+	}
 	int check_uniqueness(char* file_name, char* value)
 	{
 		char line[100];
@@ -129,6 +286,7 @@ INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 
 		FILE *fp = fopen($12,"a");
 		fprintf(fp, "%s %s %s %s %s %s\n",$4,$5,$6,$7,$8,$9 );
+		emp_size++;
 		fclose(fp);
 	}; | INSERT RECORD LB NUM STRING STRING RB INTO VAR COLON {
 		char *file_name = "DEPT.txt";
@@ -144,6 +302,7 @@ INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		}		
 		FILE *fp = fopen($9,"a");
 		fprintf(fp, "%s %s %s\n",$4,$5,$6);
+		dept_size++;
 		fclose(fp);
 	};
 
@@ -158,114 +317,36 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			printf("Error in conditions\n");
 			return 0; 
 		}
-
 		
-
+		
 		// Doing for Ands first
 		for(int o=0;o<ind_and_or;o++)
 		{
-			FILE *fp = fopen($4,"r");
-			FILE *fp_temp = fopen("temp_file.txt","w");
-			char line[100], original_line[100];
-			char *field_val;
 			if(joiners[o]==0)
 				continue;
 			else
 			{
-				int r[100], row = -1;
+				int and_r[100], row = -1;
 				for(int ii=0;ii<100;ii++)
-					r[ii]=1;
+					and_r[ii]=1;
 				while(joiners[o]==1)
 				{
-					FILE *fp = fopen($4,"r");
-					row = -1;
-					while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+					for(int i=o; i<o+2; i++)
 					{
-						row++;
-						strcpy(original_line,line);
-						int field_num = 0;
-						char* saveptr1;
-						field_val = strtok_r(line," ",&saveptr1);
-
-						while(field_val!=NULL)	// Iterate over each field in the record
+						// printf("jkfnje\n");
+						row = Result($4,i);
+						for(int k = 0;k<=row;k++)
 						{
-							char field_name[10];
-							strcpy(field_name,emp_fields[field_num]);
-							char condition[100];
-							// Iterate over each condition
-							for(int i=o; i<o+2; i++)
-							{
-								char* saveptr2;
-								strcpy(condition, conditions[i]);
-								char* operand1 = strtok_r(condition," ",&saveptr2);
-								char* operator = strtok_r(NULL," ",&saveptr2);
-								char* operand2 = strtok_r(NULL," ",&saveptr2);
-								if(strcmp(operand1,field_name)==0)
-								{
-									// Checking for integer fields
-									if(field_num!=1 && field_num!=3)
-									{
-										int op = atoi(operand2);
-										int val = atoi(field_val);
-										if((strcmp(operator,"==")==0 && op==val)
-											|| (strcmp(operator,"!=")==0 && op!=val)
-											|| (strcmp(operator,">=")==0 && op<=val)
-											|| (strcmp(operator,"<=")==0 && op>=val)
-											|| (strcmp(operator,">")==0 && op<val)
-											|| (strcmp(operator,"<")==0 && op>val)
-											)
-										{
-											r[row] *= 1;
-										}
-										else 
-										{
-											r[row] *= 0;
-										}
-									}
-									// For strings
-									else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
-										|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val))
-										|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)>=0)
-										|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)<=0)
-										|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)>0)
-										|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)<0)
-										)
-									{
-										r[row] *= 1;
-									}
-									else 
-										r[row] *= 0;
-
-								}
-							}
-							field_num++;
-							field_val = strtok_r(NULL," ",&saveptr1);
+							and_r[k] *= results[k];
 						}
-						
 					}
-					fclose(fp);
 					o++;
 				}
 				row = -1;
-				fclose(fp);
-				FILE *fp = fopen($4,"r");
-				while (fgets(original_line,100,fp)!=NULL)
-				{
-					row++;
-					if(!r[row])
-						fprintf(fp_temp, "%s",original_line );
-				}
-				
-				fclose(fp);
-				fclose(fp_temp);
-				fp = fopen($4,"w");
-				fp_temp = fopen("temp_file.txt","r");
-				while (fgets(line,100,fp_temp)!=NULL)
-					fprintf(fp, "%s",line );
-				fclose(fp);
-				fclose(fp_temp);
-			}
-		}
+				Delete($4,and_r);
+		
+		 	}
+		 }
 
 		// Doing  for Ors
 		for(int o=0;o<ind_and_or;o++)
@@ -456,7 +537,6 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 				fclose(fp_temp);
 			}
 		}
-
 	};
 
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
