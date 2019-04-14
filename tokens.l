@@ -5,19 +5,18 @@
 %}
 
 %%
-INSERT return INSERT;
-RECORD return RECORD;
-GET return GET;
-AND return AND;
-OR return OR;
-UPDATE return UPDATE;
-DELETE return DELETE;
-INTO return INTO;
-into return INTO;
-SET return SET;
-TO return TO;
-WHERE return WHERE;
-FROM return FROM;
+[iI][nN][sS][eE][rR][tT] return INSERT;
+[rR][eE][cC][oO][rR][dD] return RECORD;
+[gG][eE][tT] return GET;
+[aA][nN][dD] return AND;
+[oO][rR] return OR;
+[uU][Pp][Dd][aA][tT][eE] return UPDATE;
+[dD][eE][lL][eE][Tt][Ee] return DELETE;
+[iI][nN][Tt][Oo] return INTO;
+[sS][eE][tT] return SET;
+[tT][oO] return TO;
+[wW][hH][eE][rR][eE] return WHERE;
+[fF][rR][Oo][mM] return FROM;
 
 [1-9][0-9]* {strcpy(yylval.str,yytext); return NUM;}
 \"[A-Za-z0-9.]+\" {strcpy(yylval.str,yytext);return STRING;}
