@@ -73,12 +73,14 @@
 	char *file1 = "EMP.txt";
 	char *file2 = "DEPT.txt";
 	char conditions[100][100];
-	int joiners[10],results[100]={0};
+	int joiner[10],joiners[10],results[100]={0};
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
 
 	int check_conditions()
 	{
+		for(int k = ind_and_or-1;k >=0;k--)
+			joiners[ind_and_or-k-1] = joiner[k];
 		char condition[100];
 		int result = 0;
 		// Iterate over each condition
@@ -284,7 +286,7 @@
 		return 1;
 	}
 
-#line 288 "y.tab.c" /* yacc.c:339  */
+#line 290 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -366,12 +368,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 247 "tokens.y" /* yacc.c:355  */
+#line 249 "tokens.y" /* yacc.c:355  */
 
 		char str[200];              /* Ptr to constant string (strings are malloc'd) */
 	
 
-#line 375 "y.tab.c" /* yacc.c:355  */
+#line 377 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -388,7 +390,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 392 "y.tab.c" /* yacc.c:358  */
+#line 394 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -687,8 +689,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   252,   252,   252,   254,   291,   309,   542,   543,   545,
-     552,   561,   562
+       0,   254,   254,   254,   256,   293,   311,   370,   371,   373,
+     380,   389,   390
 };
 #endif
 
@@ -1475,19 +1477,19 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 252 "tokens.y" /* yacc.c:1646  */
+#line 254 "tokens.y" /* yacc.c:1646  */
     {printf("Statement executed succesfully.\n");}
-#line 1481 "y.tab.c" /* yacc.c:1646  */
+#line 1483 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 252 "tokens.y" /* yacc.c:1646  */
+#line 254 "tokens.y" /* yacc.c:1646  */
     {printf("Statement executed succesfully.\n");}
-#line 1487 "y.tab.c" /* yacc.c:1646  */
+#line 1489 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 254 "tokens.y" /* yacc.c:1646  */
+#line 256 "tokens.y" /* yacc.c:1646  */
     {
 		char *file_name = "EMP.txt";
 		if(strcmp((yyvsp[-1].str),file_name))
@@ -1526,11 +1528,11 @@ yyreduce:
 		emp_size++;
 		fclose(fp);
 	}
-#line 1530 "y.tab.c" /* yacc.c:1646  */
+#line 1532 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 291 "tokens.y" /* yacc.c:1646  */
+#line 293 "tokens.y" /* yacc.c:1646  */
     {
 		char *file_name = "DEPT.txt";
 		if(strcmp((yyvsp[-1].str),file_name))
@@ -1548,11 +1550,11 @@ yyreduce:
 		dept_size++;
 		fclose(fp);
 	}
-#line 1552 "y.tab.c" /* yacc.c:1646  */
+#line 1554 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 309 "tokens.y" /* yacc.c:1646  */
+#line 311 "tokens.y" /* yacc.c:1646  */
     {
 		if(strcmp((yyvsp[-3].str),"EMP.txt")!=0 && strcmp((yyvsp[-3].str),"DEPT.txt")!=0)
 		{
@@ -1589,7 +1591,6 @@ yyreduce:
 					}
 					o++;
 				}
-				row = -1;
 				Delete((yyvsp[-3].str),and_r);
 		
 		 	}
@@ -1598,210 +1599,37 @@ yyreduce:
 		// Doing  for Ors
 		for(int o=0;o<ind_and_or;o++)
 		{
-			FILE *fp = fopen((yyvsp[-3].str),"r");
-			FILE *fp_temp = fopen("temp_file.txt","w");
-			char line[100], original_line[100];
-			char *field_val;
 			if(joiners[o]==1)
 				continue;
 			if(joiners[o]==0 && o==0)
 			{
-				int r[100] = {0}, row = -1;
-				row = -1;
-				while (fgets(line,100,fp)!=NULL)	// Iterate over each record
-				{
-					row++;
-					strcpy(original_line,line);
-					int field_num = 0;
-					char* saveptr1;
-					field_val = strtok_r(line," ",&saveptr1);
-
-					while(field_val!=NULL)	// Iterate over each field in the record
-					{
-						char field_name[10];
-						strcpy(field_name,emp_fields[field_num]);
-						char condition[100];
-						for(int i=0; i<1; i++)
-						{
-							char* saveptr2;
-							strcpy(condition, conditions[i]);
-							char* operand1 = strtok_r(condition," ",&saveptr2);
-							char* operator = strtok_r(NULL," ",&saveptr2);
-							char* operand2 = strtok_r(NULL," ",&saveptr2);
-							if(strcmp(operand1,field_name)==0)
-							{
-								// Checking for integer fields
-								if(field_num!=1 && field_num!=3)
-								{
-									int op = atoi(operand2);
-									int val = atoi(field_val);
-									if((strcmp(operator,"==")==0 && op==val)
-										|| (strcmp(operator,"!=")==0 && op!=val)
-										|| (strcmp(operator,">=")==0 && op<=val)
-										|| (strcmp(operator,"<=")==0 && op>=val)
-										|| (strcmp(operator,">")==0 && op<val)
-										|| (strcmp(operator,"<")==0 && op>val)
-										)
-									{
-										r[row] = 1;
-									}
-									else 
-									{
-										r[row] = 0;
-									}
-								}
-								// For strings
-								else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
-									|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val))
-									|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)>=0)
-									|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)<=0)
-									|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)>0)
-									|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)<0)
-									)
-								{
-									r[row] = 1;
-								}
-								else 
-								{	
-									r[row] = 0;
-								}
-
-							}
-						}
-						field_num++;
-						field_val = strtok_r(NULL," ",&saveptr1);
-					}
-					
-				}
-				fclose(fp);
-				row = -1;
-				fp = fopen((yyvsp[-3].str),"r");
-				while (fgets(original_line,100,fp)!=NULL)
-				{
-					row++;
-					if(!r[row])
-						fprintf(fp_temp, "%s",original_line );
-				}
-				
-				fclose(fp);
-				fclose(fp_temp);
-				fp = fopen((yyvsp[-3].str),"w");
-				fp_temp = fopen("temp_file.txt","r");
-				while (fgets(line,100,fp_temp)!=NULL)
-					fprintf(fp, "%s",line );
-				fclose(fp);
-				fclose(fp_temp);
-
+				int row = Result((yyvsp[-3].str),o);
+				Delete((yyvsp[-3].str),results);
 			}
 			if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
 			{
-				int r[100], row = -1;
-				fp = fopen((yyvsp[-3].str),"r");
-				fp_temp = fopen("temp_file.txt","w");
-				row = -1;
-				while (fgets(line,100,fp)!=NULL)	// Iterate over each record
-				{
-					row++;
-					strcpy(original_line,line);
-					int field_num = 0;
-					char* saveptr1;
-					field_val = strtok_r(line," ",&saveptr1);
-
-					while(field_val!=NULL)	// Iterate over each field in the record
-					{
-						char field_name[10];
-						strcpy(field_name,emp_fields[field_num]);
-						char condition[100];
-						for(int i=o+1; i<o+2; i++)
-						{
-							char* saveptr2;
-							strcpy(condition, conditions[i]);
-							char* operand1 = strtok_r(condition," ",&saveptr2);
-							char* operator = strtok_r(NULL," ",&saveptr2);
-							char* operand2 = strtok_r(NULL," ",&saveptr2);
-							if(strcmp(operand1,field_name)==0)
-							{
-								// Checking for integer fields
-								if(field_num!=1 && field_num!=3)
-								{
-									int op = atoi(operand2);
-									int val = atoi(field_val);
-									if((strcmp(operator,"==")==0 && op==val)
-										|| (strcmp(operator,"!=")==0 && op!=val)
-										|| (strcmp(operator,">=")==0 && op<=val)
-										|| (strcmp(operator,"<=")==0 && op>=val)
-										|| (strcmp(operator,">")==0 && op<val)
-										|| (strcmp(operator,"<")==0 && op>val)
-										)
-									{
-										printf("Remove%d\n",row);
-										r[row] = 1;
-									}
-									else 
-									{
-										printf("Keep%d\n",row);
-										r[row] = 0;
-									}
-								}
-								// For strings
-								else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
-									|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val))
-									|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)>=0)
-									|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)<=0)
-									|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)>0)
-									|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)<0)
-									)
-								{
-									r[row] = 1;
-								}
-								else 
-									r[row] = 0;
-
-							}
-						}
-						field_num++;
-						field_val = strtok_r(NULL," ",&saveptr1);
-					}
-					
-				}
-				fclose(fp);
-				row = -1;
-				fp = fopen((yyvsp[-3].str),"r");
-				while (fgets(original_line,100,fp)!=NULL)
-				{
-					row++;
-					if(!r[row])
-						fprintf(fp_temp, "%s",original_line );
-				}
-				
-				fclose(fp);
-				fclose(fp_temp);
-				fp = fopen((yyvsp[-3].str),"w");
-				fp_temp = fopen("temp_file.txt","r");
-				while (fgets(line,100,fp_temp)!=NULL)
-					fprintf(fp, "%s",line );
-				fclose(fp);
-				fclose(fp_temp);
-			}
+				int row = Result((yyvsp[-3].str),o+1);
+				Delete((yyvsp[-3].str),results);
+			}		
 		}
 	}
-#line 1789 "y.tab.c" /* yacc.c:1646  */
+#line 1617 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 542 "tokens.y" /* yacc.c:1646  */
+#line 370 "tokens.y" /* yacc.c:1646  */
     {strcpy(conditions[ind_condition++],(yyvsp[-2].str));}
-#line 1795 "y.tab.c" /* yacc.c:1646  */
+#line 1623 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 543 "tokens.y" /* yacc.c:1646  */
+#line 371 "tokens.y" /* yacc.c:1646  */
     {strcpy(conditions[ind_condition++],(yyvsp[0].str));}
-#line 1801 "y.tab.c" /* yacc.c:1646  */
+#line 1629 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 545 "tokens.y" /* yacc.c:1646  */
+#line 373 "tokens.y" /* yacc.c:1646  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
 		strcat((yyval.str)," ");
@@ -1809,11 +1637,11 @@ yyreduce:
 		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1813 "y.tab.c" /* yacc.c:1646  */
+#line 1641 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 552 "tokens.y" /* yacc.c:1646  */
+#line 380 "tokens.y" /* yacc.c:1646  */
     {
 		strcpy((yyval.str),(yyvsp[-2].str));
 		strcat((yyval.str)," ");
@@ -1821,23 +1649,23 @@ yyreduce:
 		strcat((yyval.str)," ");
 		strcat((yyval.str),(yyvsp[0].str));
 		}
-#line 1825 "y.tab.c" /* yacc.c:1646  */
+#line 1653 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 561 "tokens.y" /* yacc.c:1646  */
-    { joiners[ind_and_or++] = 1; }
-#line 1831 "y.tab.c" /* yacc.c:1646  */
+#line 389 "tokens.y" /* yacc.c:1646  */
+    { joiner[ind_and_or++] = 1; }
+#line 1659 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 562 "tokens.y" /* yacc.c:1646  */
-    { joiners[ind_and_or++] = 0; }
-#line 1837 "y.tab.c" /* yacc.c:1646  */
+#line 390 "tokens.y" /* yacc.c:1646  */
+    { joiner[ind_and_or++] = 0; }
+#line 1665 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1841 "y.tab.c" /* yacc.c:1646  */
+#line 1669 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2065,4 +1893,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 563 "tokens.y" /* yacc.c:1906  */
+#line 391 "tokens.y" /* yacc.c:1906  */

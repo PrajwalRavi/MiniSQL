@@ -8,12 +8,14 @@
 	char *file1 = "EMP.txt";
 	char *file2 = "DEPT.txt";
 	char conditions[100][100];
-	int joiners[10],results[100]={0};
+	int joiner[10],joiners[10],results[100]={0};
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
 
 	int check_conditions()
 	{
+		for(int k = ind_and_or-1;k >=0;k--)
+			joiners[ind_and_or-k-1] = joiner[k];
 		char condition[100];
 		int result = 0;
 		// Iterate over each condition
@@ -342,7 +344,6 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 					}
 					o++;
 				}
-				row = -1;
 				Delete($4,and_r);
 		
 		 	}
@@ -351,191 +352,18 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 		// Doing  for Ors
 		for(int o=0;o<ind_and_or;o++)
 		{
-			FILE *fp = fopen($4,"r");
-			FILE *fp_temp = fopen("temp_file.txt","w");
-			char line[100], original_line[100];
-			char *field_val;
 			if(joiners[o]==1)
 				continue;
 			if(joiners[o]==0 && o==0)
 			{
-				int r[100] = {0}, row = -1;
-				row = -1;
-				while (fgets(line,100,fp)!=NULL)	// Iterate over each record
-				{
-					row++;
-					strcpy(original_line,line);
-					int field_num = 0;
-					char* saveptr1;
-					field_val = strtok_r(line," ",&saveptr1);
-
-					while(field_val!=NULL)	// Iterate over each field in the record
-					{
-						char field_name[10];
-						strcpy(field_name,emp_fields[field_num]);
-						char condition[100];
-						for(int i=0; i<1; i++)
-						{
-							char* saveptr2;
-							strcpy(condition, conditions[i]);
-							char* operand1 = strtok_r(condition," ",&saveptr2);
-							char* operator = strtok_r(NULL," ",&saveptr2);
-							char* operand2 = strtok_r(NULL," ",&saveptr2);
-							if(strcmp(operand1,field_name)==0)
-							{
-								// Checking for integer fields
-								if(field_num!=1 && field_num!=3)
-								{
-									int op = atoi(operand2);
-									int val = atoi(field_val);
-									if((strcmp(operator,"==")==0 && op==val)
-										|| (strcmp(operator,"!=")==0 && op!=val)
-										|| (strcmp(operator,">=")==0 && op<=val)
-										|| (strcmp(operator,"<=")==0 && op>=val)
-										|| (strcmp(operator,">")==0 && op<val)
-										|| (strcmp(operator,"<")==0 && op>val)
-										)
-									{
-										r[row] = 1;
-									}
-									else 
-									{
-										r[row] = 0;
-									}
-								}
-								// For strings
-								else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
-									|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val))
-									|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)>=0)
-									|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)<=0)
-									|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)>0)
-									|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)<0)
-									)
-								{
-									r[row] = 1;
-								}
-								else 
-								{	
-									r[row] = 0;
-								}
-
-							}
-						}
-						field_num++;
-						field_val = strtok_r(NULL," ",&saveptr1);
-					}
-					
-				}
-				fclose(fp);
-				row = -1;
-				fp = fopen($4,"r");
-				while (fgets(original_line,100,fp)!=NULL)
-				{
-					row++;
-					if(!r[row])
-						fprintf(fp_temp, "%s",original_line );
-				}
-				
-				fclose(fp);
-				fclose(fp_temp);
-				fp = fopen($4,"w");
-				fp_temp = fopen("temp_file.txt","r");
-				while (fgets(line,100,fp_temp)!=NULL)
-					fprintf(fp, "%s",line );
-				fclose(fp);
-				fclose(fp_temp);
-
+				int row = Result($4,o);
+				Delete($4,results);
 			}
 			if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
 			{
-				int r[100], row = -1;
-				fp = fopen($4,"r");
-				fp_temp = fopen("temp_file.txt","w");
-				row = -1;
-				while (fgets(line,100,fp)!=NULL)	// Iterate over each record
-				{
-					row++;
-					strcpy(original_line,line);
-					int field_num = 0;
-					char* saveptr1;
-					field_val = strtok_r(line," ",&saveptr1);
-
-					while(field_val!=NULL)	// Iterate over each field in the record
-					{
-						char field_name[10];
-						strcpy(field_name,emp_fields[field_num]);
-						char condition[100];
-						for(int i=o+1; i<o+2; i++)
-						{
-							char* saveptr2;
-							strcpy(condition, conditions[i]);
-							char* operand1 = strtok_r(condition," ",&saveptr2);
-							char* operator = strtok_r(NULL," ",&saveptr2);
-							char* operand2 = strtok_r(NULL," ",&saveptr2);
-							if(strcmp(operand1,field_name)==0)
-							{
-								// Checking for integer fields
-								if(field_num!=1 && field_num!=3)
-								{
-									int op = atoi(operand2);
-									int val = atoi(field_val);
-									if((strcmp(operator,"==")==0 && op==val)
-										|| (strcmp(operator,"!=")==0 && op!=val)
-										|| (strcmp(operator,">=")==0 && op<=val)
-										|| (strcmp(operator,"<=")==0 && op>=val)
-										|| (strcmp(operator,">")==0 && op<val)
-										|| (strcmp(operator,"<")==0 && op>val)
-										)
-									{
-										printf("Remove%d\n",row);
-										r[row] = 1;
-									}
-									else 
-									{
-										printf("Keep%d\n",row);
-										r[row] = 0;
-									}
-								}
-								// For strings
-								else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
-									|| (strcmp(operator,"!=")==0 && strcmp(operand2,field_val))
-									|| (strcmp(operator,">=")==0 && strcmp(field_val,operand2)>=0)
-									|| (strcmp(operator,"<=")==0 && strcmp(field_val,operand2)<=0)
-									|| (strcmp(operator,">")==0 && strcmp(field_val,operand2)>0)
-									|| (strcmp(operator,"<")==0 && strcmp(field_val,operand2)<0)
-									)
-								{
-									r[row] = 1;
-								}
-								else 
-									r[row] = 0;
-
-							}
-						}
-						field_num++;
-						field_val = strtok_r(NULL," ",&saveptr1);
-					}
-					
-				}
-				fclose(fp);
-				row = -1;
-				fp = fopen($4,"r");
-				while (fgets(original_line,100,fp)!=NULL)
-				{
-					row++;
-					if(!r[row])
-						fprintf(fp_temp, "%s",original_line );
-				}
-				
-				fclose(fp);
-				fclose(fp_temp);
-				fp = fopen($4,"w");
-				fp_temp = fopen("temp_file.txt","r");
-				while (fgets(line,100,fp_temp)!=NULL)
-					fprintf(fp, "%s",line );
-				fclose(fp);
-				fclose(fp_temp);
-			}
+				int row = Result($4,o+1);
+				Delete($4,results);
+			}		
 		}
 	};
 
@@ -558,6 +386,6 @@ CONDITION: VAR REL_OP STRING {
 		};
 
 
-JOINER: AND { joiners[ind_and_or++] = 1; }
-		| OR { joiners[ind_and_or++] = 0; };
+JOINER: AND { joiner[ind_and_or++] = 1; }
+		| OR { joiner[ind_and_or++] = 0; };
 %%
