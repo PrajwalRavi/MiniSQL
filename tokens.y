@@ -46,6 +46,23 @@
 		
 		return 1;
 	}
+	int check_fields(char *file)
+	{
+		for(int i = 0; i <ind_field; i++)
+		{
+			if(strcmp(file,"EMP.txt") == 0)
+				for(int j = 0;j < 6;j++)
+				{
+					if(strcmp(field_list[j],field_list[i])) return 0;
+				}
+			else if(strcmp(file,"DEPT.txt") == 0)
+				for(int j = 0;j < 3;j++)
+				{
+					if(strcmp(field_list[j],field_list[i])) return 0;
+				}
+		}
+		return 1;
+	}
 
 	void Delete(char *file,int res[100])
 	{
@@ -186,6 +203,11 @@
 
 	void Select(char *file,int res[100])
 	{
+		if(check_fields(file) == 0)
+		{
+			printf("Wrong fields given !!!\n");
+			return;
+		}
 		FILE *fp = fopen(file,"r");
 		FILE *view = fopen("Result.txt","w");
 		char line[100],original_line[100];
