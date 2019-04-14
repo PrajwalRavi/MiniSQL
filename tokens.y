@@ -442,7 +442,7 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 	// FILE *fpres = fopen("Result.txt","r");
 	int and_r[100],final_r[100];
 	for(int ii=0;ii<100;ii++)
-		final_r[ii]=1;
+		final_r[ii]=0;
 	// printf("%d\n",ind_and_or);
 	int row = -1;
 	if(ind_and_or==0)
@@ -509,10 +509,6 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 	 		
 	 		// Delete($4,results);
 	 	}		
-	 }
-	 for(int k = 0;k<=row;k++)
-	 {
-	 	printf("%d\n",final_r[k]);
 	 }
 	 Select($4,final_r);
 };
