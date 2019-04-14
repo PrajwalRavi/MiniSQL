@@ -50,16 +50,25 @@
 	{
 		for(int i = 0; i <ind_field; i++)
 		{
+			int result = 0;
 			if(strcmp(file,"EMP.txt") == 0)
-				for(int j = 0;j < 6;j++)
-				{
-					if(strcmp(field_list[j],field_list[i])) return 0;
-				}
+			{
+				result=0;
+				for(int j=0;j<6;j++)
+					if(strcmp(emp_fields[j],field_list[i])==0)  
+						result=1;
+				if(result==0)
+					return 0;
+			}
 			else if(strcmp(file,"DEPT.txt") == 0)
-				for(int j = 0;j < 3;j++)
-				{
-					if(strcmp(field_list[j],field_list[i])) return 0;
-				}
+			{
+				result = 0;
+				for(int j=0;j<3;j++)
+					if(strcmp(dept_fields[j],field_list[i])==0) 
+						result=1;
+				if(result==0)
+					return 0;
+			}
 		}
 		return 1;
 	}
@@ -209,7 +218,6 @@
 			return;
 		}
 		FILE *fp = fopen(file,"r");
-		FILE *view = fopen("Result.txt","w");
 		char line[100],original_line[100];
 		int row = -1;
 		int field_num = -1;
@@ -242,7 +250,6 @@
 			printf("\n");
 		}
 		fclose(fp);
-		fclose(view);
 	}
 
 	int check_uniqueness(char* file_name, char* value)
