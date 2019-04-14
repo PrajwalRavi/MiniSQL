@@ -18,7 +18,7 @@
 [wW][hH][eE][rR][eE] return WHERE;
 [fF][rR][Oo][mM] return FROM;
 
-[1-9][0-9]* {strcpy(yylval.str,yytext); return NUM;}
+[0]|[1-9][0-9]* {strcpy(yylval.str,yytext); return NUM;}
 \"[A-Za-z0-9._]+\" {strcpy(yylval.str,yytext);return STRING;}
 [A-Za-z_][A-Za-z0-9.$_]* {strcpy(yylval.str,yytext); return VAR;}
 \( {strcpy(yylval.str,yytext); return LB;}
