@@ -1,8 +1,14 @@
-DELETE RECORD FROM EMP.txt WHERE eage==25;
 INSERT RECORD (21,"CSDVSD",554,"vfvb54", 245, 665) INTO EMP.txt ;
 INSERT RECORD (35,"trhtr",324,"qwe", 765, 98) INTO EMP.txt ;
 INSERT RECORD (45,"sferf",67,"hthf", 546, 665) INTO EMP.txt ;
-INSERT RECORD (87,"trjhtyhrt",5478,"mhg", 980, 4) INTO EMP.txt ;
+INSERT RECORD (87,"trjhtyhrt",5478,"mhg", 980, 98) INTO EMP.txt ;
 INSERT RECORD (98,"CSDVSD","jyhgf") INTO DEPT.txt ;
-GET eid, ename FROM EMP.txt WHERE eage==25;
-GET RECORD FROM EMP.txt WHERE eage==25;
+INSERT RECORD (25,"CSD4354nVSD","vs685") INTO DEPT.txt ;
+
+DELETE RECORD FROM EMP.txt WHERE eid==25 OR eage>323 AND ename=="trhtr";
+DELETE RECORD FROM EMP.txt WHERE ename>="Dfdgdg";
+DELETE RECORD FROM DEPT.txt WHERE dnum==98;
+DELETE RECORD FROM DEPT.txt WHERE dname>="Dvfd";
+
+GET eid, ename FROM EMP.txt WHERE eage==554;
+GET eid, enme FROM EMP.txt WHERE eid==45;

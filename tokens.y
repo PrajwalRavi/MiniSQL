@@ -63,7 +63,7 @@
 			FILE *fp1 = fopen("EMP.txt","r");
 			while (fgets(line,100,fp)!=NULL)
 			{
-				char* original_line;
+				char original_line[100];
 				strcpy(original_line,line);
 				row++;
 				if(res[row])
@@ -233,7 +233,7 @@
 						if(strcmp(field_list[k],emp_fields[field_num]) == 0)
 						{
 							// printf("sfdsdgsd\n");
-							fprintf(view,"%s ",fields);
+							printf("%s ",fields);
 						}
 					}
 				}
@@ -243,7 +243,7 @@
 					{
 						if(strcmp(field_list[k],dept_fields[field_num]) == 0)
 						{
-							fprintf(view,"%s ",fields);
+							printf("%s ",fields);
 						}
 					}
 				}
@@ -251,7 +251,7 @@
 				field_num++;
 
 			}
-			fprintf(view,"\n");
+			printf("\n");
 
 		}
 		fclose(fp);
@@ -301,10 +301,13 @@
 	};
 
 %%	
+
 STMT: INS {printf("Statement executed succesfully.\n");} 
 	| DEL {printf("Statement executed succesfully.\n");}
-	| SELECT {printf("Statement executed succesfully.\n");};
-
+	| SELECT {printf("Statement executed succesfully.\n");}
+	| INS STMT {printf("Statement executed succesfully.\n");} 
+	| DEL STMT {printf("Statement executed succesfully.\n");}
+	| SELECT STMT {printf("Statement executed succesfully.\n");}
 INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		char *file_name = "EMP.txt";
 		if(strcmp($12,file_name))

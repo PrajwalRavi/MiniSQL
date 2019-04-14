@@ -10,3 +10,4 @@ EMP.txt
 *.o
 *.c
 *.out
+*.h
