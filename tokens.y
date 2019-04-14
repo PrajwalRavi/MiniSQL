@@ -3,11 +3,11 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	int ind_condition = 0, ind_and_or = 0, ind_result = 0;
+	int ind_condition = 0, ind_and_or = 0, ind_result = 0, ind_field=0;
 	int emp_size = 0,dept_size = 0;
 	char *file1 = "EMP.txt";
 	char *file2 = "DEPT.txt";
-	char conditions[100][100];
+	char conditions[100][100], field_list[100][100];
 	int joiner[10],joiners[10],results[100]={0};
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
@@ -207,6 +207,56 @@
 		return row;
 					
 	}
+
+	void Select(char *file,int res[100])
+	{
+		FILE *fp = fopen(file,"r");
+		FILE *view = fopen("Result.txt","w");
+		char line[100],original_line[100];
+		int row = -1;
+		int field_num = -1;
+		while(fgets(line,100,fp) != NULL)
+		{	
+			row++;
+			if(!res[row]) continue;
+			// printf("%d\n",row);
+			strcpy(original_line,line);
+			char *saveptr;
+			char *fields = strtok_r(line," ",&saveptr);
+			field_num = 0;
+			while(fields != NULL)
+			{
+				if(strcmp(file,"EMP.txt") == 0)
+				{
+					for(int k = 0; k <ind_field;k++)
+					{
+						if(strcmp(field_list[k],emp_fields[field_num]) == 0)
+						{
+							// printf("sfdsdgsd\n");
+							fprintf(view,"%s ",fields);
+						}
+					}
+				}
+				else
+				{
+					for(int k = 0; k <ind_field;k++)
+					{
+						if(strcmp(field_list[k],dept_fields[field_num]) == 0)
+						{
+							fprintf(view,"%s ",fields);
+						}
+					}
+				}
+				fields = strtok_r(NULL," ",&saveptr);
+				field_num++;
+
+			}
+			fprintf(view,"\n");
+
+		}
+		fclose(fp);
+		fclose(view);
+	}
 	int check_uniqueness(char* file_name, char* value)
 	{
 		char line[100];
@@ -241,9 +291,9 @@
 %token <str> RB
 %token <str> COLON
 %token <str> REL_OP
-
 %type <str> CONDITION
 %type <str> CONDITIONS
+%type <str> FIELDLIST
 %type <str> JOINER
 
 %union {
@@ -251,7 +301,9 @@
 	};
 
 %%	
-STMT: INS {printf("Statement executed succesfully.\n");}; | DEL {printf("Statement executed succesfully.\n");};
+STMT: INS {printf("Statement executed succesfully.\n");} 
+	| DEL {printf("Statement executed succesfully.\n");}
+	| SELECT {printf("Statement executed succesfully.\n");};
 
 INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		char *file_name = "EMP.txt";
@@ -322,6 +374,11 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 		
 		
 		// Doing for Ands first
+		if(ind_and_or==0)
+		{
+			int row = Result($4,0);
+			Delete($4,results);
+		}
 		for(int o=0;o<ind_and_or;o++)
 		{
 			if(joiners[o]==0)
@@ -367,6 +424,96 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 		}
 	};
 
+SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
+	if(strcmp($4,"EMP.txt")!=0 && strcmp($4,"DEPT.txt")!=0)
+	{
+		printf("File doesn't exist\n");
+		return 0;
+	}
+	if(check_conditions()==0)
+	{
+		printf("Error in conditions\n");
+		return 0; 
+	}
+	//Evaluate select for AND's first
+	// FILE *fpres = fopen("Result.txt","r");
+	int and_r[100],final_r[100];
+	for(int ii=0;ii<100;ii++)
+		final_r[ii]=1;
+	// printf("%d\n",ind_and_or);
+	int row = -1;
+	if(ind_and_or==0)
+	{
+		int row = Result($4,0);
+		// printf("%d\n",row);
+		// Select($4,results);
+		for(int k = 0; k <= row ;k++)
+	 		{
+	 			final_r[k] = results[k];
+	 			// printf("%d\n",results[k]);
+	 		}
+
+	}
+	for(int o=0;o<ind_and_or;o++)
+	{
+		if(joiners[o]==0)
+			continue;
+		else
+		{
+			for(int ii=0;ii<100;ii++)
+				and_r[ii]=1;
+			while(joiners[o]==1)
+			{
+				for(int i=o; i<o+2; i++)
+				{
+					// printf("jkfnje\n");
+					row = Result($4,i);
+					for(int k = 0;k<=row;k++)
+					{
+						and_r[k] *= results[k];
+					}
+				}
+				o++;
+			}
+			for(int k = 0; k <=row ;k++)
+			{
+				final_r[k] |= and_r[k];
+			}
+	
+	 	}
+	 }
+	 for(int o=0;o<ind_and_or;o++)
+	 {
+	 	if(joiners[o]==1)
+	 		continue;
+	 	if(joiners[o]==0 && o==0)
+	 	{
+	 		row = Result($4,o);
+	 		for(int k = 0; k <100;k++)
+	 		{
+	 			final_r[k] |= results[k];
+	 		}
+	 		
+	 		// Delete($4,results);
+	 	}
+	 	if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
+	 	{
+	 		row = Result($4,o+1);
+	 		for(int k = 0; k <100;k++)
+	 		{
+	 			final_r[k] |= results[k];
+	 		}
+	 		
+	 		// Delete($4,results);
+	 	}		
+	 }
+	 for(int k = 0;k<=row;k++)
+	 {
+	 	printf("%d\n",final_r[k]);
+	 }
+	 Select($4,final_r);
+};
+
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
 			| CONDITION {strcpy(conditions[ind_condition++],$1);};  
 
@@ -388,4 +535,7 @@ CONDITION: VAR REL_OP STRING {
 
 JOINER: AND { joiner[ind_and_or++] = 1; }
 		| OR { joiner[ind_and_or++] = 0; };
+
+FIELDLIST: VAR FIELDLIST{strcpy(field_list[ind_field++],$1);}
+		| VAR{strcpy(field_list[ind_field++],$1); };
 %%
