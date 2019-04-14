@@ -407,15 +407,11 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			if(joiners[o]==0 && o==0)
 			{
 				int row = Result($4,o);
-				for(int k=0;k<=row;k++)
-					printf("%d\n",results[k]);
 				Delete($4,results);
 			}
 			if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
 			{
 				int row = Result($4,o+1);
-				for(int k=0;k<=row;k++)
-					printf("%d\n",results[k]);
 				Delete($4,results);
 			}		
 		}
