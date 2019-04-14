@@ -18,35 +18,30 @@
 			joiners[ind_and_or-k-1] = joiner[k];
 		char condition[100];
 		int result = 0;
-		// Iterate over each condition
 		for(int i=0; i<ind_condition; i++)
 		{
 			result = 0;
 			strcpy(condition, conditions[i]);
 			char* field = strtok(condition," ");
 			for(int i=0; i<6; i++)
-				if(strcmp(emp_fields[i],field)!=0)
+				if(strcmp(emp_fields[i],field)==0)
 					result = 1;
 			if(result==0)
 				break;
 		}
 		if(result==1)
 			return 1;
-		result = 1;
+		result = 0;
 		for(int i=0; i<ind_condition; i++)
 		{
 			result = 0;
 			strcpy(condition, conditions[i]);
 			char* field = strtok(condition," ");
 			for(int i=0; i<3; i++)
-				if(strcmp(dept_fields[i],field)!=0)
+				if(strcmp(dept_fields[i],field)==0)
 					result =  1;
 			if(result==0)
 				return 0;
-			// if(!(strcmp(field,"eid") || strcmp(field,"ename") || strcmp(field,"eage") || strcmp(field,"eaddress") || strcmp(field,"salary") || strcmp(field,"deptno")))
-			// 	return 0;
-			// if(!(strcmp(field,"dnum") || strcmp(field,"dname") || strcmp(field,"dlocation")))
-			// 	return 0;
 		}
 		
 		return 1;
@@ -92,9 +87,7 @@
 					
 				}
 				else
-				{
 					fprintf(fp_temp,"%s",line);
-				}
 			}
 
 			fclose(fp1);	
@@ -119,26 +112,23 @@
 		fclose(fp);
 		fclose(fp_temp);
 	}
+
 	int Result(char * file,int ind_condition)
 	{
-		// printf("I sdfam here!!!!!!!!!\n");
-
 		FILE *fp  = fopen(file,"r");
 		char line[100], original_line[100];
 		char *field_val;
 		int row = -1,i = ind_condition;
-		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		while (fgets(line,100,fp)!=NULL)
 		{
 			row++;
-			// printf("%d\n",row);
 			strcpy(original_line,line);
 			int field_num = 0;
 			char* saveptr1;
 			field_val = strtok_r(line," ",&saveptr1);
 
-			while(field_val!=NULL)	// Iterate over each field in the record
+			while(field_val!=NULL)
 			{
-				// printf("infinite\n");
 				char field_name[10];
 				if(strcmp(file,"EMP.txt") == 0)
 					strcpy(field_name,emp_fields[field_num]);
@@ -151,8 +141,6 @@
 				char* operand2 = strtok_r(NULL," ",&saveptr2);
 				if(strcmp(operand1,field_name)==0)
 				{
-					// Checkg for integer fields
-					// printf("sdfdsdf\n");
 					int j = strcmp(file,"EMP.txt")==0?3:2;
 					if(field_num!=1 && field_num!=j)
 					{
@@ -167,13 +155,9 @@
 							)
 						{
 							results[row] = 1;
-							// printf("Remove%d\n",row);
 						}
 						else 
-						{
 							results[row] = 0;
-							// printf("Keep%d\n",row);
-						}
 					}
 					// For strings
 					else if((strcmp(operator,"==")==0 && strcmp(operand2,field_val)==0)
@@ -185,13 +169,9 @@
 						)
 					{
 						results[row] = 1;
-						// printf("Remove%d\n",row);
 					}
 					else 
-					{
 						results[row] = 0;
-						// printf("Keep%d\n",row);
-					}
 
 				}
 			field_num++;
@@ -199,10 +179,6 @@
 			}
 		}
 		fclose(fp);
-		// printf("%d\n",row);
-		// for(int k = 0;k <= row;k++){
-		// 	printf("%d ",results[k]);
-		// }
 		printf("\n");
 		return row;
 					
@@ -219,7 +195,6 @@
 		{	
 			row++;
 			if(!res[row]) continue;
-			// printf("%d\n",row);
 			strcpy(original_line,line);
 			char *saveptr;
 			char *fields = strtok_r(line," ",&saveptr);
@@ -229,40 +204,31 @@
 				if(strcmp(file,"EMP.txt") == 0)
 				{
 					for(int k = 0; k <ind_field;k++)
-					{
 						if(strcmp(field_list[k],emp_fields[field_num]) == 0)
-						{
-							// printf("sfdsdgsd\n");
 							printf("%s ",fields);
-						}
-					}
 				}
 				else
 				{
 					for(int k = 0; k <ind_field;k++)
-					{
 						if(strcmp(field_list[k],dept_fields[field_num]) == 0)
-						{
 							printf("%s ",fields);
-						}
-					}
 				}
 				fields = strtok_r(NULL," ",&saveptr);
 				field_num++;
 
 			}
 			printf("\n");
-
 		}
 		fclose(fp);
 		fclose(view);
 	}
+
 	int check_uniqueness(char* file_name, char* value)
 	{
 		char line[100];
 		char* field_val;
 		FILE* fp = fopen(file_name,"r");
-		while (fgets(line,100,fp)!=NULL)	// Iterate over each record
+		while (fgets(line,100,fp)!=NULL)
 		{
 			field_val = strtok(line," ");
 			if(strcmp(field_val,value)==0)
@@ -297,7 +263,7 @@
 %type <str> JOINER
 
 %union {
-		char str[200];              /* Ptr to constant string (strings are malloc'd) */
+		char str[200];
 	};
 
 %%	
@@ -375,7 +341,6 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			return 0; 
 		}
 		
-		
 		// Doing for Ands first
 		if(ind_and_or==0)
 		{
@@ -395,17 +360,13 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 				{
 					for(int i=o; i<o+2; i++)
 					{
-						// printf("jkfnje\n");
 						row = Result($4,i);
 						for(int k = 0;k<=row;k++)
-						{
 							and_r[k] *= results[k];
-						}
 					}
 					o++;
 				}
 				Delete($4,and_r);
-		
 		 	}
 		 }
 
@@ -438,23 +399,15 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 		printf("Error in conditions\n");
 		return 0; 
 	}
-	//Evaluate select for AND's first
-	// FILE *fpres = fopen("Result.txt","r");
 	int and_r[100],final_r[100];
 	for(int ii=0;ii<100;ii++)
 		final_r[ii]=0;
-	// printf("%d\n",ind_and_or);
 	int row = -1;
 	if(ind_and_or==0)
 	{
 		int row = Result($4,0);
-		// printf("%d\n",row);
-		// Select($4,results);
 		for(int k = 0; k <= row ;k++)
-	 		{
 	 			final_r[k] = results[k];
-	 			// printf("%d\n",results[k]);
-	 		}
 
 	}
 	for(int o=0;o<ind_and_or;o++)
@@ -469,20 +422,14 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 			{
 				for(int i=o; i<o+2; i++)
 				{
-					// printf("jkfnje\n");
 					row = Result($4,i);
 					for(int k = 0;k<=row;k++)
-					{
 						and_r[k] *= results[k];
-					}
 				}
 				o++;
 			}
 			for(int k = 0; k <=row ;k++)
-			{
 				final_r[k] |= and_r[k];
-			}
-	
 	 	}
 	 }
 	 for(int o=0;o<ind_and_or;o++)
@@ -493,21 +440,13 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 	 	{
 	 		row = Result($4,o);
 	 		for(int k = 0; k <100;k++)
-	 		{
 	 			final_r[k] |= results[k];
-	 		}
-	 		
-	 		// Delete($4,results);
 	 	}
 	 	if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
 	 	{
 	 		row = Result($4,o+1);
 	 		for(int k = 0; k <100;k++)
-	 		{
 	 			final_r[k] |= results[k];
-	 		}
-	 		
-	 		// Delete($4,results);
 	 	}		
 	 }
 	 Select($4,final_r);
