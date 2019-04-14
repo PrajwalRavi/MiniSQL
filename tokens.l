@@ -19,8 +19,8 @@
 [fF][rR][Oo][mM] return FROM;
 
 [1-9][0-9]* {strcpy(yylval.str,yytext); return NUM;}
-\"[A-Za-z0-9.]+\" {strcpy(yylval.str,yytext);return STRING;}
-[A-Za-z_][A-Za-z0-9.]* {strcpy(yylval.str,yytext); return VAR;}
+\"[A-Za-z0-9._]+\" {strcpy(yylval.str,yytext);return STRING;}
+[A-Za-z_][A-Za-z0-9.$_]* {strcpy(yylval.str,yytext); return VAR;}
 \( {strcpy(yylval.str,yytext); return LB;}
 \) {strcpy(yylval.str,yytext); return RB;}
 \; {strcpy(yylval.str,yytext); return COLON;}

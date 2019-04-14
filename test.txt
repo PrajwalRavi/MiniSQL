@@ -2,13 +2,17 @@ INSERT RECORD (21,"CSDVSD",554,"vfvb54", 245, 665) INTO EMP.txt ;
 INSERT RECORD (35,"trhtr",324,"qwe", 765, 98) INTO EMP.txt ;
 INSERT RECORD (45,"sferf",67,"hthf", 546, 665) INTO EMP.txt ;
 INSERT RECORD (87,"trjhtyhrt",5478,"mhg", 980, 98) INTO EMP.txt ;
+INSERT RECORD (147,"Peralta",24,"mfhjnh5g", 980, 25) INTO EMP.txt ;
+INSERT RECORD (45,"Peralta",24,"vsdv", 980, 25) INTO EMP.txt ;
 INSERT RECORD (98,"CSDVSD","jyhgf") INTO DEPT.txt ;
 INSERT RECORD (25,"CSD4354nVSD","vs685") INTO DEPT.txt ;
 
-DELETE RECORD FROM EMP.txt WHERE eid==25 OR eage>323 AND ename=="trhtr";
-DELETE RECORD FROM EMP.txt WHERE ename>="Dfdgdg";
-DELETE RECORD FROM DEPT.txt WHERE dnum==98;
+delete RECORD FROM EMP.txt WHERE eid==21 AND ename!="trhtr" AND eage==554 AND deptno>55;
+DELETE RECORD FROM EMP.txt WHERE eame=="sferf" OR eage==58;
+DELETE RECORD FROM EMP.txt WHERE eage==58;
+DELETE RECORD FROM DEPT.txt WHERE dnum==98 OR dname!="cdsc";
 DELETE RECORD FROM DEPT.txt WHERE dname>="Dvfd";
 
-GET eid, ename FROM EMP.txt WHERE eage==554;
-GET eid, enme FROM EMP.txt WHERE eid==45;
+GET eid, ename FROM EMP.txt WHERE eage>0;
+GET eage, ename,eaddress FROM EMP.txt WHERE ename!="Peralta";
+get dnum from DEPT.txt where dnum!=0;
