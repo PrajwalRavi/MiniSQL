@@ -1,5 +1,13 @@
 .idea
 trial
-a.out
-ins_test.txt
 lex.yy.c
+y.tab.h
+y.tab.c
+temp_file.txt
+DEPT.txt
+EMP.txt
+
+*.o
+*.c
+*.out
+*.h
