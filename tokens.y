@@ -48,6 +48,62 @@
 		return 1;
 	}
 
+	int check_uniqueness(char* file_name, char* value)
+	{
+		char line[100];
+		char* field_val;
+		FILE* fp = fopen(file_name,"r");
+		while (fgets(line,100,fp)!=NULL)
+		{
+			field_val = strtok(line," ");
+			if(strcmp(field_val,value)==0)
+				return 0;
+		}
+		return 1;
+	}
+
+	int check_constraint(char* value)
+	{
+		FILE* dept_fp = fopen("DEPT.txt","r");
+		char line[100];
+		char* field_val;
+		int flag = 1;
+		while (fgets(line,100,dept_fp)!=NULL)	// Iterate over each record
+		{
+			field_val = strtok(line," ");
+			if(strcmp(field_val,value)==0)
+			{
+				return 1;
+			}
+		}
+		return 0;
+	}
+
+	int check_constraint2(char* value)
+	{
+		FILE *fp1 = fopen("EMP.txt","r");
+		char record[100];
+		while(fgets(record,100,fp1) != NULL)
+		{	
+			int num_field = 0;
+			char *esaveptr;
+			char *efields = strtok_r(record," ",&esaveptr);
+			while(num_field != 5)
+			{	
+				efields = strtok_r(NULL," ",&esaveptr);
+				num_field++;
+			}
+			if(strcmp(value,efields)==0)
+			{
+				fclose(fp1);
+				return 0;
+			}
+
+		}
+		fclose(fp1);
+		return 1;
+	}
+
 	int check_fields(char *file)
 	{
 		for(int i = 0; i <ind_field; i++)
@@ -79,7 +135,7 @@
 	{
 		FILE *fp_temp = fopen("temp_file.txt","w");
 		FILE *fp = fopen(file,"r");
-		char record[100],line[100];
+		char line[100];
 		int row = -1;
 		if(strcmp(file,"DEPT.txt") == 0)
 		{
@@ -92,28 +148,12 @@
 				{
 					char* dsaveptr;
 					char *dfields = strtok_r(line," ",&dsaveptr);
-					int ddeptno = atoi(dfields);
-					FILE *fp1 = fopen("EMP.txt","r");
-					while(fgets(record,100,fp1) != NULL)
-					{	
-						int num_field = 0;
-						char *esaveptr;
-						char *efields = strtok_r(record," ",&esaveptr);
-						while(num_field != 5)
-						{	
-							efields = strtok_r(NULL," ",&esaveptr);
-							num_field++;
-						}
-						int edeptno = atoi(efields);
-						if(edeptno == ddeptno)
-						{
-							// printf("Cannot delete a reference to a foreign key!!\n");
-							fprintf(fp_temp, "%s",original_line);
-							break;
-						}
-
-					}
-					fclose(fp1);	
+					if(check_constraint2(dfields)==0)
+					{
+						printf("Cannot delete a reference to a foreign key!!\n");
+						fprintf(fp_temp, "%s",original_line);
+						break;
+					}	
 				}
 				else
 					fprintf(fp_temp,"%s",line);
@@ -255,14 +295,15 @@
 
 	void Update(char *file,int res[100],char *upfield)
 	{
+		strcpy(field_list[0],upfield);
+		ind_field=1;
 		if(check_fields(file) == 0)
 		{
-			printf("Wrong fields given !!!\n");
+			printf("Wrong field given !!!\n");
 			return;
 		}
 		FILE *fp = fopen(file,"r");
 		FILE *fp1 = fopen("Update.txt","w");
-		// char record[100][100];
 		char line[100],original_line[100];
 		int row = -1;
 		int field_num = -1;
@@ -279,13 +320,35 @@
 			field_num = 0;
 			while(fields != NULL)
 			{
+				int flag = 0;
 				if(strcmp(file,"EMP.txt") == 0)
 				{
 					if(strcmp(upfield,emp_fields[field_num])==0)
 					{
-						strcpy(fields,update_string);
-						if(field_num==5)
-							strcat(update_string,"\n");
+						if(field_num!=1 && field_num!=3)
+						{
+							flag=1;
+							char *ptr;
+							strtol(update_string, &ptr, 10);
+							if(*ptr!='\0')
+								printf("Given field should be integer\n");
+						}
+						if(field_num==5 && !check_constraint(update_string))
+						{
+							flag = 1;
+							printf("Foreign-key constraint violated\n");
+						}
+						if(field_num==0 && !check_uniqueness(file,update_string))
+						{
+							flag=1;
+							printf("Eid should be unique\n");
+						}
+						if(flag==0)
+						{
+							strcpy(fields,update_string);
+							if(field_num==5)
+								strcat(update_string,"\n");
+						}
 					}
 					if(field_num==5)
 						fprintf(fp1,"%s",fields);
@@ -296,9 +359,30 @@
 				{
 					if(strcmp(upfield,dept_fields[field_num])==0)
 					{
-						strcpy(fields,update_string);
-						if(field_num==2)
-							strcat(update_string,"\n");
+						if(field_num!=1 && field_num!=2)
+						{
+							flag=1;
+							char *ptr;
+							strtol(update_string, &ptr, 10);
+							if(*ptr!='\0')
+								printf("Given field should be integer\n");
+						}
+						if(field_num==0 && !check_uniqueness(file,update_string))
+						{
+							flag=1;
+							printf("dnum should be unique\n");
+						}
+						if(field_num==0 && !check_constraint2(fields))
+						{
+							flag=1;
+							printf("Foreign-key constraint violated\n");
+						}
+						if(flag==0)
+						{
+							strcpy(fields,update_string);
+							if(field_num==2)
+								strcat(update_string,"\n");
+						}
 					}
 					if(field_num==2)
 						fprintf(fp1,"%s",fields);
@@ -317,39 +401,9 @@
 			fprintf(fp, "%s",line );
 		fclose(fp);
 		fclose(fp1);
-
 	}
 
-	int check_uniqueness(char* file_name, char* value)
-	{
-		char line[100];
-		char* field_val;
-		FILE* fp = fopen(file_name,"r");
-		while (fgets(line,100,fp)!=NULL)
-		{
-			field_val = strtok(line," ");
-			if(strcmp(field_val,value)==0)
-				return 0;
-		}
-		return 1;
-	}
-
-	int check_constraint(char* value)
-	{
-		FILE* dept_fp = fopen("DEPT.txt","r");
-		char line[100];
-		char* field_val;
-		int flag = 1;
-		while (fgets(line,100,dept_fp)!=NULL)	// Iterate over each record
-		{
-			field_val = strtok(line," ");
-			if(strcmp(field_val,value)==0)
-			{
-				return 1;
-			}
-		}
-		return 0;
-	}
+	
 %}
 
 %token <str> INSERT 
@@ -441,12 +495,15 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 			printf("Error in conditions\n");
 			return 0; 
 		}
-		
-		// Doing for Ands first
+		int and_r[100],final_r[100];
+		for(int ii=0;ii<100;ii++)
+			final_r[ii]=0;
+		int row = -1;
 		if(ind_and_or==0)
 		{
-			int row = Result($4,0);
-			Delete($4,results);
+			row = Result($4,0);
+			for(int k = 0; k <= row ;k++)
+	 			final_r[k] = results[k];
 		}
 		for(int o=0;o<ind_and_or;o++)
 		{
@@ -454,7 +511,6 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 				continue;
 			else
 			{
-				int and_r[100], row = -1;
 				for(int ii=0;ii<100;ii++)
 					and_r[ii]=1;
 				while(joiners[o]==1)
@@ -467,26 +523,28 @@ DEL: DELETE RECORD FROM VAR WHERE CONDITIONS COLON {
 					}
 					o++;
 				}
-				Delete($4,and_r);
+				for(int k = 0; k <=row ;k++)
+				final_r[k] |= and_r[k];
 		 	}
 		 }
-
-		// Doing  for Ors
 		for(int o=0;o<ind_and_or;o++)
 		{
 			if(joiners[o]==1)
 				continue;
 			if(joiners[o]==0 && o==0)
 			{
-				int row = Result($4,o);
-				Delete($4,results);
+				row = Result($4,o);
+	 			for(int k = 0; k <100;k++)
+	 				final_r[k] |= results[k];
 			}
 			if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
 			{
-				int row = Result($4,o+1);
-				Delete($4,results);
+				row = Result($4,o+1);
+	 			for(int k = 0; k <100;k++)
+	 				final_r[k] |= results[k];
 			}		
 		}
+		Delete($4,final_r);
 	};
 
 SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
