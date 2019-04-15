@@ -333,6 +333,23 @@
 		}
 		return 1;
 	}
+
+	int check_constraint(char* value)
+	{
+		FILE* dept_fp = fopen("DEPT.txt","r");
+		char line[100];
+		char* field_val;
+		int flag = 1;
+		while (fgets(line,100,dept_fp)!=NULL)	// Iterate over each record
+		{
+			field_val = strtok(line," ");
+			if(strcmp(field_val,value)==0)
+			{
+				return 1;
+			}
+		}
+		return 0;
+	}
 %}
 
 %token <str> INSERT 
@@ -385,20 +402,7 @@ INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		}
 		
 		// Check foreign-key constraint
-		FILE* dept_fp = fopen("DEPT.txt","r");
-		char line[100];
-		char* field_val;
-		int flag = 1;
-		while (fgets(line,100,dept_fp)!=NULL)	// Iterate over each record
-		{
-			field_val = strtok(line," ");
-			if(strcmp(field_val,$9)==0)
-			{
-				flag=0;
-				break;
-			}
-		}
-		if(flag)
+		if(!check_constraint($9))
 		{
 			printf("Foreign-key constraint violated\n");
 			return 0;
