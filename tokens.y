@@ -93,8 +93,10 @@
 				efields = strtok_r(NULL," ",&esaveptr);
 				num_field++;
 			}
-			strcat(value,"\n");
-			if(strcmp(value,efields)==0)
+			char check[100];
+			strcpy(check,value);
+			strcat(check,"\n");
+			if(strcmp(check,efields)==0)
 			{
 				fclose(fp1);
 				return 0;
@@ -153,7 +155,6 @@
 					{
 						printf("Cannot delete a reference to a foreign key!!\n");
 						fprintf(fp_temp, "%s",original_line);
-						break;
 					}	
 				}
 				else
