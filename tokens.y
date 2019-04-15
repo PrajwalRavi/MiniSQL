@@ -93,6 +93,7 @@
 				efields = strtok_r(NULL," ",&esaveptr);
 				num_field++;
 			}
+			strcat(value,"\n");
 			if(strcmp(value,efields)==0)
 			{
 				fclose(fp1);
