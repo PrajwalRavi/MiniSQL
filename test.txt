@@ -11,10 +11,12 @@ delete RECORD FROM EMP.txt WHERE eid==21 AND ename!="trhtr" AND eage==554 AND de
 DELETE RECORD FROM EMP.txt WHERE eame=="sferf" OR eage==58;
 DELETE RECORD FROM EMP.txt WHERE eage==58;
 DELETE RECORD FROM DEPT.txt WHERE dnum==98 OR dname!="cdsc";
-DELETE RECORD FROM DEPT.txt WHERE dname>="Dvfd";
+DELETE RECORD FROM DEPT.txt WHERE dname!="Dvfd";
 
 GET eid, ename FROM EMP.txt WHERE eage>0;
 GET eage, ename,eaddress FROM EMP.txt WHERE ename!="Peralta";
 get dnum from DEPT.txt where dnum!=0;
 
-UPDATE RECORD IN EMP.txt SET eid TO 20 WHERE eid==35;
+UPDATE RECORD IN EMP.txt SET eid TO 10 WHERE eage<234;
+update record in DEPT.txt set dnae to "Brook" where dnum==98; 
+update record in DEPT.txt set dname to "Brook" where dnum==98; 
