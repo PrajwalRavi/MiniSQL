@@ -328,11 +328,13 @@
 					{
 						if(field_num!=1 && field_num!=3)
 						{
-							flag=1;
 							char *ptr;
 							strtol(update_string, &ptr, 10);
 							if(*ptr!='\0')
+							{
+								flag=1;
 								printf("Given field should be integer\n");
+							}
 						}
 						if(field_num==5 && !check_constraint(update_string))
 						{
@@ -362,11 +364,13 @@
 					{
 						if(field_num!=1 && field_num!=2)
 						{
-							flag=1;
 							char *ptr;
 							strtol(update_string, &ptr, 10);
 							if(*ptr!='\0')
+							{
 								printf("Given field should be integer\n");
+								flag = 1;
+							}
 						}
 						if(field_num==0 && !check_uniqueness(file,update_string))
 						{
@@ -631,7 +635,7 @@ UPD : UPDATE RECORD IN VAR SET VAR TO VALUE WHERE CONDITIONS COLON {
 	{
 		int row = Result($4,0);
 		for(int k = 0; k <= row ;k++)
-	 			final_r[k] = results[k];
+	 		final_r[k] = results[k];
 	}
 	for(int o=0;o<ind_and_or;o++)
 	{
