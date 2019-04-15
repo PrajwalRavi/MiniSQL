@@ -305,19 +305,20 @@
 				fields = strtok_r(NULL," ",&saveptr);
 				field_num++;
 			}
+			char update_record[100];
+			for(int i = 0; i < 100; i++)
+			{
+				printf("%s\n",record[i]);
+				for(int j = 0;record[i][j]!='\0';j++)
+				{
+					update_record[i] = record[i][j]; 
+				}
+				update_record[i] = ' ';
+				if(i == index) break;
+			}
+			fprintf(fp1,"%s",update_record);
 		}
 		fclose(fp);
-		char update_record[100];
-		for(int i = 0; i < 100; i++)
-		{
-			for(int j = 0;record[i][j]!='\0';j++)
-			{
-				update_record[i] = record[i][j]; 
-			}
-			update_record[i] = ' ';
-			if(i == row -1) break;
-		}
-		fprintf(fp1,"%s",update_record);
 		fclose(fp1);
 		fp = fopen(file,"w");
 		fp1 = fopen("Update.txt","r");
@@ -575,7 +576,7 @@ UPD : UPDATE RECORD IN VAR SET VAR TO VALUE WHERE CONDITIONS COLON {
 	printf("%d\n",ind_and_or);
 	if(ind_and_or==0)
 	{
-		printf("HI");
+		// printf("HI");
 		int row = Result($4,0);
 		// printf("%d\n",row);
 		for(int k = 0; k <= row ;k++)

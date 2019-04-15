@@ -16,3 +16,5 @@ DELETE RECORD FROM DEPT.txt WHERE dname>="Dvfd";
 GET eid, ename FROM EMP.txt WHERE eage>0;
 GET eage, ename,eaddress FROM EMP.txt WHERE ename!="Peralta";
 get dnum from DEPT.txt where dnum!=0;
+
+UPDATE RECORD IN EMP.txt SET eid TO 20 WHERE eid==35;
