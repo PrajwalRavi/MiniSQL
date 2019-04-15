@@ -253,8 +253,9 @@
 		fclose(fp);
 	}
 
-	void Update(char *file,int res[100])
-	{
+	void Update(char *file,int res[100],char *upfield)
+	{		
+		// printf("ddddddddddddddddd");
 		if(check_fields(file) == 0)
 		{
 			printf("Wrong fields given !!!\n");
@@ -266,9 +267,10 @@
 		char line[100],original_line[100];
 		int row = -1;
 		int field_num = -1;
+		int index = 0,flag = 0;
 		for(int i = 0; i < 6;i++)
 		{
-			if(strcmp(emp_fields[i],fieldlist[0]) == 0)
+			if(strcmp(emp_fields[i],upfield) == 0)
 			{
 				flag = 1;
 				index = i;
@@ -276,7 +278,7 @@
 		}
 		for(int i = 0; i < 3;i++)
 		{
-			if(strcmp(dept_fields[i],fieldlist[0]) == 0)
+			if(strcmp(dept_fields[i],upfield) == 0)
 			{
 				flag = 0;
 				index = i;
@@ -286,14 +288,13 @@
 		{	
 			row++;
 			if(!res[row]){
-				fprintf(fp,"%s",line);
+				fprintf(fp1,"%s",line);
 				continue;
 			}
 			strcpy(original_line,line);
 			char *saveptr;
 			char *fields = strtok_r(line," ",&saveptr);
 			field_num = 0;
-			int index = 0,flag = 0;
 			while(fields != NULL)
 			{
 				if(field_num == index)
@@ -306,14 +307,24 @@
 			}
 		}
 		fclose(fp);
-		//write record to Update.txt
+		char update_record[100];
+		for(int i = 0; i < 100; i++)
+		{
+			for(int j = 0;record[i][j]!='\0';j++)
+			{
+				update_record[i] = record[i][j]; 
+			}
+			update_record[i] = ' ';
+			if(i == row -1) break;
+		}
+		fprintf(fp1,"%s",update_record);
 		fclose(fp1);
 		fp = fopen(file,"w");
-		fp_temp = fopen("Update.txt","r");
-		while (fgets(line,100,fp_temp)!=NULL)
+		fp1 = fopen("Update.txt","r");
+		while (fgets(line,100,fp1)!=NULL)
 			fprintf(fp, "%s",line );
 		fclose(fp);
-		fclose(fp_temp);
+		fclose(fp1);
 
 	}
 
@@ -349,8 +360,10 @@
 %token <str> STRING
 %token <str> LB
 %token <str> RB
+%token <str> IN
 %token <str> COLON
 %token <str> REL_OP
+
 %type <str> VALUE
 %type <str> CONDITION
 %type <str> CONDITIONS
@@ -366,9 +379,7 @@
 STMT: INS {printf("Statement executed succesfully.\n");} 
 	| DEL {printf("Statement executed succesfully.\n");}
 	| SELECT {printf("Statement executed succesfully.\n");}
-	| INS STMT {printf("Statement executed succesfully.\n");} 
-	| DEL STMT {printf("Statement executed succesfully.\n");}
-	| SELECT STMT {printf("Statement executed succesfully.\n");}
+	| UPD {printf("Statement executed succesfully.\n");};
 INS: INSERT RECORD LB NUM STRING NUM STRING NUM NUM RB INTO VAR COLON {
 		char *file_name = "EMP.txt";
 		if(strcmp($12,file_name))
@@ -546,8 +557,71 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 	 }
 	 Select($4,final_r);
 };
-UPD : UPDATE RECORD IN FIELDLIST SET VAR TO VALUE WHERE CONDITIONS COLON {
-	Update($4,final_r);
+UPD : UPDATE RECORD IN VAR SET VAR TO VALUE WHERE CONDITIONS COLON {
+	if(strcmp($4,"EMP.txt")!=0 && strcmp($4,"DEPT.txt")!=0)
+	{
+		printf("File doesn't exist\n");
+		return 0;
+	}
+	if(check_conditions()==0)
+	{
+		printf("Error in conditions\n");
+		return 0; 
+	}
+	int and_r[100],final_r[100];
+	for(int ii=0;ii<100;ii++)
+		final_r[ii]=0;
+	int row = -1;
+	printf("%d\n",ind_and_or);
+	if(ind_and_or==0)
+	{
+		printf("HI");
+		int row = Result($4,0);
+		// printf("%d\n",row);
+		for(int k = 0; k <= row ;k++)
+	 			final_r[k] = results[k];
+
+	}
+	for(int o=0;o<ind_and_or;o++)
+	{
+		if(joiners[o]==0)
+			continue;
+		else
+		{
+			for(int ii=0;ii<100;ii++)
+				and_r[ii]=1;
+			while(joiners[o]==1)
+			{
+				for(int i=o; i<o+2; i++)
+				{
+					row = Result($4,i);
+					for(int k = 0;k<=row;k++)
+						and_r[k] *= results[k];
+				}
+				o++;
+			}
+			for(int k = 0; k <=row ;k++)
+				final_r[k] |= and_r[k];
+	 	}
+	 }
+	 for(int o=0;o<ind_and_or;o++)
+	 {
+	 	if(joiners[o]==1)
+	 		continue;
+	 	if(joiners[o]==0 && o==0)
+	 	{
+	 		row = Result($4,o);
+	 		for(int k = 0; k <100;k++)
+	 			final_r[k] |= results[k];
+	 	}
+	 	if(joiners[o]==0 && ((joiners[o+1]==0 && o+1<ind_and_or) || o==ind_and_or-1)) 
+	 	{
+	 		row = Result($4,o+1);
+	 		for(int k = 0; k <100;k++)
+	 			final_r[k] |= results[k];
+	 	}		
+	 }
+	Update($4,final_r,$6);
 };
 
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
@@ -575,5 +649,5 @@ JOINER: AND { joiner[ind_and_or++] = 1; }
 FIELDLIST: VAR FIELDLIST{strcpy(field_list[ind_field++],$1);}
 		| VAR{strcpy(field_list[ind_field++],$1); };
 
-VALUE : NUM{strcpy(update_string,$1);} | STRING{strcpy(update_string,$1);};
+VALUE : NUM {strcpy(update_string,$1);} | STRING {strcpy(update_string,$1);};
 %%

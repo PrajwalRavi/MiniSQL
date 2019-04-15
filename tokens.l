@@ -17,6 +17,7 @@
 [tT][oO] return TO;
 [wW][hH][eE][rR][eE] return WHERE;
 [fF][rR][Oo][mM] return FROM;
+[iI][nN] return IN;
 
 [0]|[1-9][0-9]* {strcpy(yylval.str,yytext); return NUM;}
 \"[A-Za-z0-9._]+\" {strcpy(yylval.str,yytext);return STRING;}
