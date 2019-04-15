@@ -11,6 +11,7 @@
 	int joiner[10],joiners[10],results[100]={0};
 	char emp_fields[6][10] = {"eid","ename","eage","eaddress","salary","deptno"};
 	char dept_fields[4][10] = {"dnum", "dname", "dlocation"};
+	char update_string[100];
 
 	int check_conditions()
 	{
@@ -252,6 +253,70 @@
 		fclose(fp);
 	}
 
+	void Update(char *file,int res[100])
+	{
+		if(check_fields(file) == 0)
+		{
+			printf("Wrong fields given !!!\n");
+			return;
+		}
+		FILE *fp = fopen(file,"r");
+		FILE *fp1 = fopen("Update.txt","w");
+		char record[100][100];
+		char line[100],original_line[100];
+		int row = -1;
+		int field_num = -1;
+		for(int i = 0; i < 6;i++)
+		{
+			if(strcmp(emp_fields[i],fieldlist[0]) == 0)
+			{
+				flag = 1;
+				index = i;
+			}
+		}
+		for(int i = 0; i < 3;i++)
+		{
+			if(strcmp(dept_fields[i],fieldlist[0]) == 0)
+			{
+				flag = 0;
+				index = i;
+			}
+		}
+		while(fgets(line,100,fp) != NULL)
+		{	
+			row++;
+			if(!res[row]){
+				fprintf(fp,"%s",line);
+				continue;
+			}
+			strcpy(original_line,line);
+			char *saveptr;
+			char *fields = strtok_r(line," ",&saveptr);
+			field_num = 0;
+			int index = 0,flag = 0;
+			while(fields != NULL)
+			{
+				if(field_num == index)
+				{
+					strcpy(record[field_num],update_string);
+				}
+				strcpy(record[field_num],fields);
+				fields = strtok_r(NULL," ",&saveptr);
+				field_num++;
+			}
+		}
+		fclose(fp);
+		//write record to Update.txt
+		fclose(fp1);
+		fp = fopen(file,"w");
+		fp_temp = fopen("Update.txt","r");
+		while (fgets(line,100,fp_temp)!=NULL)
+			fprintf(fp, "%s",line );
+		fclose(fp);
+		fclose(fp_temp);
+
+	}
+
 	int check_uniqueness(char* file_name, char* value)
 	{
 		char line[100];
@@ -286,6 +351,7 @@
 %token <str> RB
 %token <str> COLON
 %token <str> REL_OP
+%type <str> VALUE
 %type <str> CONDITION
 %type <str> CONDITIONS
 %type <str> FIELDLIST
@@ -480,6 +546,9 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 	 }
 	 Select($4,final_r);
 };
+UPD : UPDATE RECORD IN FIELDLIST SET VAR TO VALUE WHERE CONDITIONS COLON {
+	Update($4,final_r);
+};
 
 CONDITIONS: CONDITION JOINER CONDITIONS {strcpy(conditions[ind_condition++],$1);}
 			| CONDITION {strcpy(conditions[ind_condition++],$1);};  
@@ -505,4 +574,6 @@ JOINER: AND { joiner[ind_and_or++] = 1; }
 
 FIELDLIST: VAR FIELDLIST{strcpy(field_list[ind_field++],$1);}
 		| VAR{strcpy(field_list[ind_field++],$1); };
+
+VALUE : NUM{strcpy(update_string,$1);} | STRING{strcpy(update_string,$1);};
 %%
