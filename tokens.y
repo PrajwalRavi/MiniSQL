@@ -47,6 +47,7 @@
 		
 		return 1;
 	}
+
 	int check_fields(char *file)
 	{
 		for(int i = 0; i <ind_field; i++)
@@ -207,8 +208,7 @@
 		}
 		fclose(fp);
 		printf("\n");
-		return row;
-					
+		return row;				
 	}
 
 	void Select(char *file,int res[100])
@@ -254,8 +254,7 @@
 	}
 
 	void Update(char *file,int res[100],char *upfield)
-	{		
-		// printf("ddddddddddddddddd");
+	{
 		if(check_fields(file) == 0)
 		{
 			printf("Wrong fields given !!!\n");
@@ -263,27 +262,10 @@
 		}
 		FILE *fp = fopen(file,"r");
 		FILE *fp1 = fopen("Update.txt","w");
-		char record[100][100];
+		// char record[100][100];
 		char line[100],original_line[100];
 		int row = -1;
 		int field_num = -1;
-		int index = 0,flag = 0;
-		for(int i = 0; i < 6;i++)
-		{
-			if(strcmp(emp_fields[i],upfield) == 0)
-			{
-				flag = 1;
-				index = i;
-			}
-		}
-		for(int i = 0; i < 3;i++)
-		{
-			if(strcmp(dept_fields[i],upfield) == 0)
-			{
-				flag = 0;
-				index = i;
-			}
-		}
 		while(fgets(line,100,fp) != NULL)
 		{	
 			row++;
@@ -297,26 +279,35 @@
 			field_num = 0;
 			while(fields != NULL)
 			{
-				if(field_num == index)
+				if(strcmp(file,"EMP.txt") == 0)
 				{
-					strcpy(record[field_num],update_string);
+					if(strcmp(upfield,emp_fields[field_num])==0)
+					{
+						strcpy(fields,update_string);
+						if(field_num==5)
+							strcat(update_string,"\n");
+					}
+					if(field_num==5)
+						fprintf(fp1,"%s",fields);
+					else
+						fprintf(fp1,"%s ",fields);
 				}
-				strcpy(record[field_num],fields);
+				else
+				{
+					if(strcmp(upfield,dept_fields[field_num])==0)
+					{
+						strcpy(fields,update_string);
+						if(field_num==2)
+							strcat(update_string,"\n");
+					}
+					if(field_num==2)
+						fprintf(fp1,"%s",fields);
+					else
+						fprintf(fp1,"%s ",fields);
+				}
 				fields = strtok_r(NULL," ",&saveptr);
 				field_num++;
 			}
-			char update_record[100];
-			for(int i = 0; i < 100; i++)
-			{
-				printf("%s\n",record[i]);
-				for(int j = 0;record[i][j]!='\0';j++)
-				{
-					update_record[i] = record[i][j]; 
-				}
-				update_record[i] = ' ';
-				if(i == index) break;
-			}
-			fprintf(fp1,"%s",update_record);
 		}
 		fclose(fp);
 		fclose(fp1);
@@ -364,7 +355,6 @@
 %token <str> IN
 %token <str> COLON
 %token <str> REL_OP
-
 %type <str> VALUE
 %type <str> CONDITION
 %type <str> CONDITIONS
@@ -557,7 +547,8 @@ SELECT: GET FIELDLIST FROM VAR WHERE CONDITIONS COLON {
 	 	}		
 	 }
 	 Select($4,final_r);
-};
+	};
+
 UPD : UPDATE RECORD IN VAR SET VAR TO VALUE WHERE CONDITIONS COLON {
 	if(strcmp($4,"EMP.txt")!=0 && strcmp($4,"DEPT.txt")!=0)
 	{
@@ -573,15 +564,11 @@ UPD : UPDATE RECORD IN VAR SET VAR TO VALUE WHERE CONDITIONS COLON {
 	for(int ii=0;ii<100;ii++)
 		final_r[ii]=0;
 	int row = -1;
-	printf("%d\n",ind_and_or);
 	if(ind_and_or==0)
 	{
-		// printf("HI");
 		int row = Result($4,0);
-		// printf("%d\n",row);
 		for(int k = 0; k <= row ;k++)
 	 			final_r[k] = results[k];
-
 	}
 	for(int o=0;o<ind_and_or;o++)
 	{
