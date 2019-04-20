@@ -1,7 +1,6 @@
 %{
 	#include<stdlib.h>
 	#include "y.tab.h"
-	// TO-DO : Make keywords case in-sensitive. INTO has been dome for you.
 %}
 
 %%
